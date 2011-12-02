@@ -1,0 +1,33 @@
+﻿<Page
+    x:Class="MetroPix.BlankPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MetroPix"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{StaticResource PageBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="140"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Standard title area -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="backButton" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
+            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Grid.Column="1" Style="{StaticResource PageTitleStyle}"/>
+        </Grid>
+
+        <!-- List style presentation only used in "snapped" view state -->
+        <ListView Grid.Row="2" >
+            <Image Source="https://www.dropbox.com/static/20577/images/logo.png" />
+            <Image Source="https://www.dropbox.com/static/20577/images/logo.png" />
+            <Image Source="https://www.dropbox.com/static/20577/images/logo.png" />
+        </ListView>
+    </Grid>
+</Page>

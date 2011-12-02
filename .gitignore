@@ -1,0 +1,4 @@
+*.suo
+*.user
+MetroPix/obj/**
+MetroPix/bin/**
