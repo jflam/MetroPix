@@ -11,7 +11,7 @@
         <Image Name="Photo" ManipulationMode="TranslateX" ManipulationCompleted="Photo_ManipulationCompleted_1" />
         <Canvas VerticalAlignment="Top" Height="60" Background="Black" Opacity="0.8">
             <!-- TODO: back button -->
-            <TextBlock Tapped="Photo_Tapped_1" FontFamily="Segoe UI" FontSize="36" Foreground="White" Margin="80,0,0,0">500px</TextBlock>
+            <TextBlock Tapped="Photo_Tapped_1" FontFamily="Segoe UI" FontSize="36" Foreground="White" Margin="80,0,0,0">metro<Run FontWeight="Bold">pix</Run></TextBlock>
         </Canvas>
         <Canvas VerticalAlignment="Bottom" Height="100" Background="Black" Opacity="0.8">
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
@@ -20,8 +20,8 @@
                     <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Artist"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Width="80" VerticalAlignment="Top">
-                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="20" Foreground="White" Name="Rating"></TextBlock>
-                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Rating</TextBlock>                    
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="24" Foreground="White" Name="Rating" FontWeight="Bold"></TextBlock>
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Rating</TextBlock>                  
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Width="40" VerticalAlignment="Top">
                     <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Views"></TextBlock>

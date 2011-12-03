@@ -34,7 +34,7 @@ namespace MetroPix
                 var image = new Image();
                 image.Margin = new Thickness(5, 0, 5, 0);
                 image.Source = new BitmapImage(photoUri);
-                image.Height = 550;
+                image.Height = 650;
                 image.Tapped += (sender, args) =>
                 {
                     // BUGBUG: all event handlers are not wired up when I go back!
