@@ -9,9 +9,9 @@ using Windows.UI.Xaml.Navigation;
 
 namespace MetroPix
 {
-    public sealed partial class BlankPage : Page
+    public sealed partial class FrontPage : Page
     {
-        public BlankPage()
+        public FrontPage()
         {
             InitializeComponent();
         }
