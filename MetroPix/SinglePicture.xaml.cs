@@ -8,6 +8,8 @@ namespace MetroPix
 {
     public sealed partial class SinglePicture : Page
     {
+        private bool _menuVisible;
+
         public SinglePicture()
         {
             InitializeComponent();
@@ -35,6 +37,22 @@ namespace MetroPix
         private void Photo_ManipulationCompleted_1(object sender, ManipulationCompletedRoutedEventArgs e)
         {
             // TODO: handle swipes 
+
+        }
+
+        private void Photo_Tapped_2(object sender, TappedRoutedEventArgs e)
+        {
+            if (_menuVisible)
+            {
+                TopMenuExitAnimation.Begin();
+                BottomMenuExitAnimation.Begin();
+            }
+            else
+            {
+                TopMenuEntryAnimation.Begin();
+                BottomMenuEntryAnimation.Begin();
+            }
+            _menuVisible = !_menuVisible;
         }
     }
 }

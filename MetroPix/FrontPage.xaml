@@ -19,7 +19,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36">metro<Run FontWeight="Bold">pix</Run></TextBlock>
+            <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run></TextBlock>
         </Grid>
 
         <!-- List style presentation only used in "snapped" view state -->
