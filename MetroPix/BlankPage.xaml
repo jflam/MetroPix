@@ -9,7 +9,7 @@
 
     <Grid Background="{StaticResource PageBackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="140"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -19,15 +19,12 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="backButton" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Grid.Column="1" Style="{StaticResource PageTitleStyle}"/>
+            <TextBlock x:Name="pageTitle" Margin="30,40,0,0" Text="{StaticResource AppName}" Grid.Column="1" Style="{StaticResource PageTitleStyle}"/>
         </Grid>
 
         <!-- List style presentation only used in "snapped" view state -->
-        <ListView Grid.Row="2" >
-            <Image Source="https://www.dropbox.com/static/20577/images/logo.png" />
-            <Image Source="https://www.dropbox.com/static/20577/images/logo.png" />
-            <Image Source="https://www.dropbox.com/static/20577/images/logo.png" />
-        </ListView>
+        <ScrollViewer Grid.Row="2" Height="550" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Horizontal" Name="Photos" />
+        </ScrollViewer>
     </Grid>
 </Page>
