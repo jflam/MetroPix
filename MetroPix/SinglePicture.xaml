@@ -11,12 +11,28 @@
         <Image Name="Photo" />
         <Canvas VerticalAlignment="Top" Height="60" Background="Black" Opacity="0.8">
             <!-- TODO: back button -->
-            <TextBlock Tapped="Photo_Tapped_1" FontFamily="Segoe UI" FontWeight="Bold" FontSize="36" Foreground="White" Margin="80,0,0,0">500px</TextBlock>
+            <TextBlock Tapped="Photo_Tapped_1" FontFamily="Segoe UI" FontSize="36" Foreground="White" Margin="80,0,0,0">500px</TextBlock>
         </Canvas>
         <Canvas VerticalAlignment="Bottom" Height="100" Background="Black" Opacity="0.8">
-            <StackPanel Orientation="Vertical" Margin="80,0,0,0">
-                <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Title"></TextBlock>
-                <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="14" Foreground="White" Name="Artist"></TextBlock>
+            <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                <StackPanel Orientation="Vertical" Margin="80,0,0,0" Width="800" VerticalAlignment="Top">
+                    <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Title"></TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="14" Foreground="White" Name="Artist"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="80" VerticalAlignment="Top">
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="20" Foreground="White" Name="Rating"></TextBlock>
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Rating</TextBlock>                    
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="40" VerticalAlignment="Top">
+                    <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Views"></TextBlock>
+                    <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Votes"></TextBlock>
+                    <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Favs"></TextBlock>                    
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="80" Margin="5,0,0,0" VerticalAlignment="Top">
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Views</TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Votes</TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Favs</TextBlock>
+                </StackPanel>
             </StackPanel>
         </Canvas>
     </Grid>

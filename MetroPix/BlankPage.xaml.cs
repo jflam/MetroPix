@@ -13,7 +13,6 @@ namespace MetroPix
         public BlankPage()
         {
             InitializeComponent();
-            LoadSomePhotos();
         }
 
         private async void LoadSomePhotos()
@@ -78,6 +77,7 @@ namespace MetroPix
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            LoadSomePhotos();
         }
     }
 }

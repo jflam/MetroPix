@@ -29,6 +29,10 @@ namespace MetroPix
             Photo.Source = new BitmapImage(new Uri(photo["photo"].GetObject()["image_url"].GetString()));
             Title.Text = photo["photo"].GetObject()["name"].GetString();
             Artist.Text = photo["photo"].GetObject()["user"].GetObject()["fullname"].GetString();
+            Rating.Text = photo["photo"].GetObject()["rating"].GetNumber().ToString();
+            Views.Text = photo["photo"].GetObject()["times_viewed"].GetNumber().ToString();
+            Votes.Text = photo["photo"].GetObject()["votes_count"].GetNumber().ToString();
+            Favs.Text = photo["photo"].GetObject()["favorites_count"].GetNumber().ToString();
         }
 
         private void Photo_Tapped_1(object sender, TappedRoutedEventArgs e)
