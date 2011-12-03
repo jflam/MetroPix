@@ -1,5 +1,6 @@
 ﻿using System;
 using Windows.UI;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -17,6 +18,7 @@ namespace MetroPix
 
         private async void LoadSomePhotos()
         {
+            // TODO: do some caching of the photo data since back is likely to be pretty popular
             var obj = await FiveHundredPixels.Site.GetPhotos("editors");
             var photos = obj["photos"].GetArray();
             var count = photos.Count;
@@ -51,6 +53,7 @@ namespace MetroPix
                 var text = new TextBlock();
                 text.Margin = new Thickness(10, 0, 0, 0);
                 text.FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI");
+                text.FontWeight = FontWeights.Bold;
                 text.Foreground = new SolidColorBrush(Colors.White);
                 text.FontSize = 24;
                 text.Text = photo["name"].GetString();
@@ -58,7 +61,8 @@ namespace MetroPix
                 var name = new TextBlock();
                 name.Margin = new Thickness(10, 0, 0, 0);
                 name.FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI");
-                name.Foreground = new SolidColorBrush(Colors.White);                name.FontSize = 14;
+                name.Foreground = new SolidColorBrush(Colors.White);                
+                name.FontSize = 12;
                 name.Text = photo["user"].GetObject()["fullname"].GetString();
 
                 var left = new StackPanel();

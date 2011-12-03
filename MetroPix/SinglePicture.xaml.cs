@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
@@ -22,6 +13,7 @@ namespace MetroPix
             InitializeComponent();
         }
 
+        // TODO: more events like handling swipe gestures
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             int id = Convert.ToInt32(e.Parameter);
@@ -38,6 +30,11 @@ namespace MetroPix
         private void Photo_Tapped_1(object sender, TappedRoutedEventArgs e)
         {
             Frame.GoBack();
+        }
+
+        private void Photo_ManipulationCompleted_1(object sender, ManipulationCompletedRoutedEventArgs e)
+        {
+            // TODO: handle swipes 
         }
     }
 }
