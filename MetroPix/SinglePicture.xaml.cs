@@ -25,16 +25,15 @@ namespace MetroPix
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             int id = Convert.ToInt32(e.Parameter);
-            try
-            {
-                var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
-                Photo.Source = new BitmapImage(new Uri(photo["photo"].GetObject()["image_url"].GetString()));
-            }
-            catch (Exception ee)
-            {
-                var s = ee.Message;
-                var x = 42;
-            }
+            var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
+            Photo.Source = new BitmapImage(new Uri(photo["photo"].GetObject()["image_url"].GetString()));
+            Title.Text = photo["photo"].GetObject()["name"].GetString();
+            Artist.Text = photo["photo"].GetObject()["user"].GetObject()["fullname"].GetString();
+        }
+
+        private void Photo_Tapped_1(object sender, TappedRoutedEventArgs e)
+        {
+            Frame.GoBack();
         }
     }
 }

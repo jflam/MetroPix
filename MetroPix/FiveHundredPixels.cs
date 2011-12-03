@@ -46,6 +46,8 @@ namespace MetroPix
             return new Uri(photoUri);
         }
 
+        // BUGBUG: I have to create a singleton FiveHundredPixels object because I can't do an HTTP request
+        // via a second HttpClient instance in the same app!
         private static FiveHundredPixels _singleton = new FiveHundredPixels();
 
         public static FiveHundredPixels Site

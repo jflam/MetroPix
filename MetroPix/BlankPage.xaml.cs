@@ -36,6 +36,7 @@ namespace MetroPix
                 image.Height = 550;
                 image.Tapped += (sender, args) =>
                 {
+                    // BUGBUG: all event handlers are not wired up when I go back!
                     Frame.Navigate(typeof(SinglePicture).FullName, id);
                 };
 

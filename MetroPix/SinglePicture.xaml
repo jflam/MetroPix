@@ -9,5 +9,15 @@
 
     <Grid Background="{StaticResource PageBackgroundBrush}">
         <Image Name="Photo" />
+        <Canvas VerticalAlignment="Top" Height="60" Background="Black" Opacity="0.8">
+            <!-- TODO: back button -->
+            <TextBlock Tapped="Photo_Tapped_1" FontFamily="Segoe UI" FontWeight="Bold" FontSize="36" Foreground="White" Margin="80,0,0,0">500px</TextBlock>
+        </Canvas>
+        <Canvas VerticalAlignment="Bottom" Height="100" Background="Black" Opacity="0.8">
+            <StackPanel Orientation="Vertical" Margin="80,0,0,0">
+                <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Title"></TextBlock>
+                <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="14" Foreground="White" Name="Artist"></TextBlock>
+            </StackPanel>
+        </Canvas>
     </Grid>
 </Page>
