@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Data.Json;
@@ -7,6 +8,8 @@ namespace MetroPix
 {
     public class FiveHundredPixels
     {
+        private HttpClient _client = new HttpClient();
+
         // Secret keys
         private const string CONSUMER_KEY = "YNkYLEDEc7bDaIW3JzJfEKO5fOmzvZr2QYvNJ1ti";
 
@@ -15,36 +18,51 @@ namespace MetroPix
 
         // This API returns square thumbnails of the photos
         // I can probably use these as placeholder images scaled appropriately?
-        private const string GET_PHOTOS_API = "https://api.500px.com/v1/photos?feature={0}&page={1}&consumer_key={2}";
+        private const string GET_PHOTOS_API = "https://api.500px.com/v1/photos?feature={0}&page={1}&consumer_key={2}&rpp={3}";
 
         private FiveHundredPixels() { }
 
         public async Task<JsonObject> GetFullSizePhoto(int id)
         {
-            using (var client = new HttpClient())
-            {
-                var requestUri = String.Format(GET_PHOTO_API, id, 4, CONSUMER_KEY);
-                var json = await client.GetStringAsync(requestUri);
-                return JsonObject.Parse(json);
-            }
+            var requestUri = String.Format(GET_PHOTO_API, id, 4, CONSUMER_KEY);
+            var json = await _client.GetStringAsync(requestUri);
+            return JsonObject.Parse(json);
         }
 
-        // TODO: parameterize some more
-        public async Task<JsonObject> GetPhotos(string collection)
+        public async Task<List<PhotoSummary>> Query(string collection, int count = 20)
         {
-            using (var client = new HttpClient())
+            var requestUri = String.Format(GET_PHOTOS_API, collection, 1, CONSUMER_KEY, count);
+            var json = await _client.GetStringAsync(requestUri);
+            var photos = JsonObject.Parse(json)["photos"].GetArray();
+            var result = new List<PhotoSummary>();
+            for (uint i = 0; i < photos.Count; i++)
             {
-                var requestUri = String.Format(GET_PHOTOS_API, collection, 1, CONSUMER_KEY);
-                var json = await client.GetStringAsync(requestUri);
-                return JsonObject.Parse(json);
+                var photo = photos.GetObjectAt(i);
+                
+                int id = Convert.ToInt32(photo["id"].GetNumber());
+                string caption = photo["name"].GetString();
+                string author = photo["user"].GetObject()["fullname"].GetString();
+                double rating = photo["rating"].GetNumber();
+                int votes = Convert.ToInt32(photo["rating"].GetNumber());
+                Uri uri = new Uri(photo["image_url"].GetString());
+
+                var item = new PhotoSummary()
+                {
+                    Id = id,
+                    Author = author,
+                    Caption = caption,
+                    Rating = rating,
+                    Votes = votes,
+                    PhotoUri = uri,
+                };
+                result.Add(item);
             }
+            return result;
         }
 
-        public Uri GetPhotoUri(JsonObject photo, int size) 
+        public Uri GetPhotoUri(PhotoSummary photo, int size)
         {
-            var url = photo["image_url"].GetString();
-            
-            // Strip off everything after the last slash - that is the size of the file
+            var url = photo.PhotoUri.ToString();
             var directory = url.Substring(0, url.LastIndexOf('/'));
             var photoUri = String.Format("{0}/{1}.jpg", directory, size);
             return new Uri(photoUri);

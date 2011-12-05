@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.UI.Input;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media.Imaging;
@@ -9,10 +10,12 @@ namespace MetroPix
     public sealed partial class SinglePicture : Page
     {
         private bool _menuVisible;
+        private GestureRecognizer _recognizer = new GestureRecognizer();
 
         public SinglePicture()
         {
             InitializeComponent();
+            
         }
 
         // TODO: more events like handling swipe gestures

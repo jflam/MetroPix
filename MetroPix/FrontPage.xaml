@@ -22,9 +22,12 @@
             <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run></TextBlock>
         </Grid>
 
+ 
         <!-- List style presentation only used in "snapped" view state -->
-        <ScrollViewer Grid.Row="2" Height="650" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto">
-            <StackPanel Orientation="Horizontal" Name="Photos" />
+        <ScrollViewer Grid.Row="2" Height="650" 
+                      VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
+                      HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
+            <StackPanel Orientation="Horizontal" Name="Photos"></StackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

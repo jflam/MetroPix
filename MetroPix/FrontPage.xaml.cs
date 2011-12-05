@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.UI;
+﻿using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -11,24 +10,19 @@ namespace MetroPix
 {
     public sealed partial class FrontPage : Page
     {
+        // Note that the .ctor fires here even if we are returning from a different page -- where do we store state?
         public FrontPage()
         {
             InitializeComponent();
         }
 
-        private async void LoadSomePhotos()
+        // TODO: figure out how to do the right kind of data binding here?! What kind of control do I need? A ListView?
+        private async void LoadPhotos()
         {
-            // TODO: do some caching of the photo data since back is likely to be pretty popular
-            var obj = await FiveHundredPixels.Site.GetPhotos("editors");
-            var photos = obj["photos"].GetArray();
-            var count = photos.Count;
-            for (uint i = 0; i < count; i++)
+            var photos = await FiveHundredPixels.Site.Query("popular", 20);
+            foreach (var photo in photos)
             {
-                var photo = photos.GetObjectAt(i);
-                int id = Convert.ToInt32(photo["id"].GetNumber());
                 var photoUri = FiveHundredPixels.Site.GetPhotoUri(photo, 4);
-
-                // Make me an image that contains an overlay
                 var grid = new Grid();
 
                 var image = new Image();
@@ -38,7 +32,7 @@ namespace MetroPix
                 image.Tapped += (sender, args) =>
                 {
                     // BUGBUG: all event handlers are not wired up when I go back!
-                    Frame.Navigate(typeof(SinglePicture).FullName, id);
+                    Frame.Navigate(typeof(SinglePicture).FullName, photo.Id);
                 };
 
                 // Make a text block with the caption
@@ -56,14 +50,14 @@ namespace MetroPix
                 text.FontWeight = FontWeights.Bold;
                 text.Foreground = new SolidColorBrush(Colors.White);
                 text.FontSize = 24;
-                text.Text = photo["name"].GetString();
+                text.Text = photo.Caption;
 
                 var name = new TextBlock();
                 name.Margin = new Thickness(10, 0, 0, 0);
                 name.FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI");
-                name.Foreground = new SolidColorBrush(Colors.White);                
+                name.Foreground = new SolidColorBrush(Colors.White);
                 name.FontSize = 12;
-                name.Text = photo["user"].GetObject()["fullname"].GetString();
+                name.Text = photo.Author;
 
                 var left = new StackPanel();
                 left.Orientation = Orientation.Vertical;
@@ -81,7 +75,7 @@ namespace MetroPix
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadSomePhotos();
+            LoadPhotos();
         }
     }
 }
