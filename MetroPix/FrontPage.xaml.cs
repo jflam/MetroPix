@@ -32,7 +32,7 @@ namespace MetroPix
                 image.Tapped += (sender, args) =>
                 {
                     // BUGBUG: all event handlers are not wired up when I go back!
-                    Frame.Navigate(typeof(SinglePicture).FullName, photo.Id);
+                    Frame.Navigate(typeof(SinglePicture), photo.Id);
                 };
 
                 // Make a text block with the caption
