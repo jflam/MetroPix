@@ -7,6 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.BottomAppBar>
+        <AppBar Padding="10,0,10,0">
+            <Button Click="Button_Click_1">Click me</Button>
+        </AppBar>
+    </Page.BottomAppBar>
+    
     <Grid Background="{StaticResource PageBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
@@ -21,7 +27,7 @@
             <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run></TextBlock>
         </Grid>
 
-        <ScrollViewer Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled"
+        <ScrollViewer Name="Viewer" Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled" Loaded="Viewer_Loaded_1"
                       VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
                       HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
             <StackPanel Orientation="Horizontal" Name="Photos" />

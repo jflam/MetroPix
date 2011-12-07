@@ -1,4 +1,6 @@
-﻿using Windows.UI;
+﻿using System;
+using System.Collections.Generic;
+using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -21,14 +23,26 @@ namespace MetroPix
             LoadPhotos();
         }
 
+        // We keep this collection so that we have the dimensions for later (and to avoid re-loading?)
+        private List<BitmapImage> _pictures = new List<BitmapImage>();
+
         private Grid RenderPhotoWithCaption(PhotoSummary photo, int index)
         {
             var grid = new Grid();
 
             var image = new Image();
-            var bitmap = new BitmapImage(photo.PhotoUri);
             image.Margin = new Thickness(5, 0, 5, 0);
-            image.Source = bitmap;
+            image.Source = photo.Photo;
+
+            // Once the bitmap image dimenions are available, we can pre-allocate the width of the image 
+            // so that we don't have an "accordian" effect when we navigate back to the front page.
+            if (photo.Photo.PixelWidth > 0)
+            {
+                // Compute the correct pixel width
+                double ratio = (double)photo.Photo.PixelWidth / (double)photo.Photo.PixelHeight;
+                double width = 650 * ratio;
+                image.Width = Convert.ToInt32(width);
+            }
             image.Height = 650;
             image.Tag = photo.Id;
 
@@ -87,9 +101,20 @@ namespace MetroPix
             {
                 if (image.Tag != null)
                 {
+                    FiveHundredPixels.Site.ScrollOffset = Viewer.HorizontalOffset;
                     Frame.Navigate(typeof(SinglePicture), image.Tag);
                 }
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            // TODO: refresh button 
+        }
+
+        private void Viewer_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            Viewer.ScrollToHorizontalOffset(FiveHundredPixels.Site.ScrollOffset);
         }
     }
 }

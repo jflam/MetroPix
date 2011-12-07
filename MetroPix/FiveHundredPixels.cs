@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Data.Json;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace MetroPix
 {
     public class PhotoSummary
     {
         public int Id { get; set; }
+        public BitmapImage Photo { get; set; }
         public Uri PhotoUri { get; set; }
         public string Caption { get; set; }
         public string Author { get; set; }
@@ -96,10 +98,12 @@ namespace MetroPix
                 double rating = photo["rating"].GetNumber();
                 int votes = Convert.ToInt32(photo["rating"].GetNumber());
                 Uri uri = GetPhotoUri(photo["image_url"].GetString(), size);
+                BitmapImage bitmap = new BitmapImage(uri);
 
                 result.Add(new PhotoSummary
                 {
                     Id = id,
+                    Photo = bitmap,
                     Caption = caption,
                     Author = author,
                     PhotoUri = uri,
@@ -128,6 +132,9 @@ namespace MetroPix
             };
             return result;
         }
+
+        // TODO: Place to store front page state ... need to move this somewhere else
+        public double ScrollOffset { get; set; }
 
         private static FiveHundredPixels _singleton = new FiveHundredPixels();
 
