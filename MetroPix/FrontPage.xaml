@@ -9,11 +9,10 @@
 
     <Grid Background="{StaticResource PageBackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Standard title area -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -22,12 +21,10 @@
             <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run></TextBlock>
         </Grid>
 
- 
-        <!-- List style presentation only used in "snapped" view state -->
-        <ScrollViewer Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1"
+        <ScrollViewer Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled"
                       VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
                       HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
-            <StackPanel Orientation="Horizontal" Name="Photos"></StackPanel>
+            <StackPanel Orientation="Horizontal" Name="Photos" />
         </ScrollViewer>
     </Grid>
 </Page>

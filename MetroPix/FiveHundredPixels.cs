@@ -16,6 +16,17 @@ namespace MetroPix
         public double Rating { get; set; }
     }
 
+    public class PhotoDetails
+    {
+        public Uri PhotoUri { get; set; }
+        public string Caption { get; set; }
+        public string Artist { get; set; }
+        public double Rating { get; set; }
+        public int Views { get; set; }
+        public int Votes { get; set; }
+        public int Favs { get; set; }
+    }
+
     public class FiveHundredPixels
     {
         private HttpClient _client = new HttpClient();
@@ -76,16 +87,24 @@ namespace MetroPix
             return result;
         }
 
-        // TODO: get rid of JsonObject
-        public async Task<JsonObject> GetFullSizePhoto(int id)
+        public async Task<PhotoDetails> GetFullSizePhoto(int id)
         {
             var requestUri = String.Format(GET_PHOTO_API, id, 4, CONSUMER_KEY);
             var json = await _client.GetStringAsync(requestUri);
-            return JsonObject.Parse(json);
+            var photo = JsonObject.Parse(json);
+            var result = new PhotoDetails
+            {
+                PhotoUri = new Uri(photo["photo"].GetObject()["image_url"].GetString()),
+                Caption = photo["photo"].GetObject()["name"].GetString(),
+                Artist = photo["photo"].GetObject()["user"].GetObject()["fullname"].GetString(),
+                Rating = photo["photo"].GetObject()["rating"].GetNumber(),
+                Views = Convert.ToInt32(photo["photo"].GetObject()["times_viewed"].GetNumber()),
+                Votes = Convert.ToInt32(photo["photo"].GetObject()["votes_count"].GetNumber()),
+                Favs = Convert.ToInt32(photo["photo"].GetObject()["favorites_count"].GetNumber())
+            };
+            return result;
         }
 
-        // BUGBUG: I have to create a singleton FiveHundredPixels object because I can't do an HTTP request
-        // via a second HttpClient instance in the same app!
         private static FiveHundredPixels _singleton = new FiveHundredPixels();
 
         public static FiveHundredPixels Site

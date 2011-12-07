@@ -25,8 +25,8 @@ namespace MetroPix
         {
             var grid = new Grid();
 
-            var bitmap = new BitmapImage(photo.PhotoUri);
             var image = new Image();
+            var bitmap = new BitmapImage(photo.PhotoUri);
             image.Margin = new Thickness(5, 0, 5, 0);
             image.Source = bitmap;
             image.Height = 650;

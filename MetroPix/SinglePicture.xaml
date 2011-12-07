@@ -48,7 +48,9 @@
     </Page.Resources>
     
     <Grid Background="{StaticResource PageBackgroundBrush}">
-        <Image Name="Photo" ManipulationMode="TranslateX" Tapped="Photo_Tapped_2" ManipulationCompleted="Photo_ManipulationCompleted_1" />
+        <Image Name="Photo" ManipulationMode="TranslateX" Tapped="Photo_Tapped_2" 
+               ManipulationStarting="Photo_ManipulationStarting_1" ManipulationCompleted="Photo_ManipulationCompleted_1" 
+               ManipulationDelta="Photo_ManipulationDelta_1" />
         <Canvas VerticalAlignment="Top" Height="60" Background="Black" Opacity="0.8">
             <Canvas.RenderTransform>
                 <TranslateTransform x:Name="TopMenuTransform" Y="-60" />
@@ -61,7 +63,7 @@
             </Canvas.RenderTransform>
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <StackPanel Orientation="Vertical" Margin="80,0,0,0" Width="800" VerticalAlignment="Top">
-                    <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Title"></TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Caption"></TextBlock>
                     <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Artist"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Width="80" VerticalAlignment="Top">

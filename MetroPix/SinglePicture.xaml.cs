@@ -15,21 +15,19 @@ namespace MetroPix
         public SinglePicture()
         {
             InitializeComponent();
-            
         }
 
-        // TODO: more events like handling swipe gestures
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             int id = Convert.ToInt32(e.Parameter);
             var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
-            Photo.Source = new BitmapImage(new Uri(photo["photo"].GetObject()["image_url"].GetString()));
-            Title.Text = photo["photo"].GetObject()["name"].GetString();
-            Artist.Text = photo["photo"].GetObject()["user"].GetObject()["fullname"].GetString();
-            Rating.Text = photo["photo"].GetObject()["rating"].GetNumber().ToString();
-            Views.Text = photo["photo"].GetObject()["times_viewed"].GetNumber().ToString();
-            Votes.Text = photo["photo"].GetObject()["votes_count"].GetNumber().ToString();
-            Favs.Text = photo["photo"].GetObject()["favorites_count"].GetNumber().ToString();
+            Photo.Source = new BitmapImage(photo.PhotoUri);
+            Caption.Text = photo.Caption;
+            Artist.Text = photo.Artist;
+            Rating.Text = String.Format("{0:F1}", photo.Rating);
+            Views.Text = photo.Views.ToString();
+            Votes.Text = photo.Votes.ToString();
+            Favs.Text = photo.Votes.ToString();
         }
 
         private void Photo_Tapped_1(object sender, TappedRoutedEventArgs e)
@@ -39,8 +37,6 @@ namespace MetroPix
 
         private void Photo_ManipulationCompleted_1(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            // TODO: handle swipes 
-
         }
 
         private void Photo_Tapped_2(object sender, TappedRoutedEventArgs e)
@@ -56,6 +52,14 @@ namespace MetroPix
                 BottomMenuEntryAnimation.Begin();
             }
             _menuVisible = !_menuVisible;
+        }
+
+        private void Photo_ManipulationStarting_1(object sender, ManipulationStartingRoutedEventArgs e)
+        {
+        }
+
+        private void Photo_ManipulationDelta_1(object sender, ManipulationDeltaRoutedEventArgs e)
+        {
         }
     }
 }
