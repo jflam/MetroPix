@@ -28,11 +28,13 @@ namespace MetroPix
 
         private Grid RenderPhotoWithCaption(PhotoSummary photo, int index)
         {
-            var grid = new Grid();
-
-            var image = new Image();
-            image.Margin = new Thickness(5, 0, 5, 0);
-            image.Source = photo.Photo;
+            var image = new Image
+            {
+                Margin = new Thickness(5, 0, 5, 0),
+                Source = photo.Photo,
+                Height = 650,
+                Tag = photo.Id
+            };
 
             // Once the bitmap image dimenions are available, we can pre-allocate the width of the image 
             // so that we don't have an "accordian" effect when we navigate back to the front page.
@@ -43,43 +45,47 @@ namespace MetroPix
                 double width = 650 * ratio;
                 image.Width = Convert.ToInt32(width);
             }
-            image.Height = 650;
-            image.Tag = photo.Id;
-            
-            // Make a text block with the caption
-            var canvas = new Canvas();
-            canvas.VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Bottom;
-            canvas.Width = image.Width;
-            canvas.Margin = new Thickness(5, 0, 5, 0);
-            canvas.Height = 60;
-            canvas.Background = new SolidColorBrush(Colors.Black);
-            canvas.Opacity = 0.8;
 
-            var text = new TextBlock();
-            text.Margin = new Thickness(10, 0, 0, 0);
-            text.FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI");
-            text.FontWeight = FontWeights.Bold;
-            text.Foreground = new SolidColorBrush(Colors.White);
-            text.FontSize = 24;
-            text.Text = photo.Caption;
+            var text = new TextBlock
+            {
+                Margin = new Thickness(10, 0, 0, 0),
+                FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI"),
+                FontWeight = FontWeights.Bold,
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 24,
+                Text = photo.Caption
+            };
 
-            var name = new TextBlock();
-            name.Margin = new Thickness(10, 0, 0, 0);
-            name.FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI");
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.FontSize = 12;
-            name.Text = photo.Author;
+            var name = new TextBlock
+            {
+                Margin = new Thickness(10, 0, 0, 0),
+                FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI"),
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 12,
+                Text = photo.Author
+            };
 
-            var left = new StackPanel();
-            left.Orientation = Orientation.Vertical;
-            left.Children.Add(text);
-            left.Children.Add(name);
+            var left = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Children = { text, name }
+            };
 
-            canvas.Children.Add(left);
+            var canvas = new Canvas
+            {
+                VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Bottom,
+                Width = image.Width,
+                Margin = new Thickness(5, 0, 5, 0),
+                Height = 60,
+                Background = new SolidColorBrush(Colors.Black),
+                Opacity = 0.8,
+                Children = { left }
+            };
 
-            grid.Children.Add(image);
-            grid.Children.Add(canvas);
-
+            var grid = new Grid
+            {
+                Children = { image, canvas }
+            };
             return grid;
         }
 
