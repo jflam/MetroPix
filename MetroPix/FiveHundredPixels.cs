@@ -50,6 +50,30 @@ namespace MetroPix
             return new Uri(photoUri);
         }
 
+        private async Task<string> SubmitRequest(string url)
+        {
+            int i = 0;
+            while (true)
+            {
+                try
+                {
+                    return await _client.GetStringAsync(url);
+                }
+                catch (Exception e)
+                {
+                    i++;
+                    if (i < 5)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
+            }
+        }
+
         private List<PhotoSummary> _photos;
 
         // TODO: fix caching
@@ -59,7 +83,7 @@ namespace MetroPix
                 return _photos;
 
             var requestUri = String.Format(GET_PHOTOS_API, collection, 1, CONSUMER_KEY, count);
-            var json = await _client.GetStringAsync(requestUri);
+            var json = await SubmitRequest(requestUri);
             var photos = JsonObject.Parse(json)["photos"].GetArray();
             var result = new List<PhotoSummary>();
             for (uint i = 0; i < photos.Count; i++)
@@ -90,7 +114,7 @@ namespace MetroPix
         public async Task<PhotoDetails> GetFullSizePhoto(int id)
         {
             var requestUri = String.Format(GET_PHOTO_API, id, 4, CONSUMER_KEY);
-            var json = await _client.GetStringAsync(requestUri);
+            var json = await SubmitRequest(requestUri);
             var photo = JsonObject.Parse(json);
             var result = new PhotoDetails
             {
