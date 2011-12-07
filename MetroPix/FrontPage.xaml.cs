@@ -23,9 +23,6 @@ namespace MetroPix
             LoadPhotos();
         }
 
-        // We keep this collection so that we have the dimensions for later (and to avoid re-loading?)
-        private List<BitmapImage> _pictures = new List<BitmapImage>();
-
         private Grid RenderPhotoWithCaption(PhotoSummary photo, int index)
         {
             var image = new Image
