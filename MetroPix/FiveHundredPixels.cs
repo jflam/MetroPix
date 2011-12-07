@@ -79,6 +79,15 @@ namespace MetroPix
         private List<PhotoSummary> _photos;
 
         // TODO: fix caching
+        // TODO: fix how we think about querying for the photos
+        // - Need to have a sorted list of pictures
+        // - Once we have the first picture loaded we add it to the UI
+        // - Once we have the next picture loaded we add it to the UI
+        // - Need to have a mechanism to correlate the index of the request with the photo
+        // - When that photo == current index we append to the list
+        // - Do we need to fire events from here when we get a new photo in the sequence?
+        // - We hide the out of order nature from the caller?
+        // - What happens with a timeout?
         public async Task<List<PhotoSummary>> Query(string collection, int count = 20, int size = 4)
         {
             if (_photos != null)

@@ -45,7 +45,7 @@ namespace MetroPix
             }
             image.Height = 650;
             image.Tag = photo.Id;
-
+            
             // Make a text block with the caption
             var canvas = new Canvas();
             canvas.VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Bottom;
@@ -85,7 +85,7 @@ namespace MetroPix
 
         private async void LoadPhotos()
         {
-            var photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
+            var photos = await MetroPix.FiveHundredPixels.Site.Query("editors", 50, 4);
 
             for (int i = 0; i < photos.Count; i++)
             {
