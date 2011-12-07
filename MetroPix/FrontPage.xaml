@@ -24,7 +24,7 @@
 
  
         <!-- List style presentation only used in "snapped" view state -->
-        <ScrollViewer Grid.Row="2" Height="650" 
+        <ScrollViewer Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1"
                       VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
                       HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
             <StackPanel Orientation="Horizontal" Name="Photos"></StackPanel>
