@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -33,25 +36,29 @@ namespace MetroPix
             LoadPhotos(photos);
         }
 
-        private Grid RenderPhotoWithCaption(PhotoSummary photo, int index)
+        private async Task<BitmapImage> DownloadImageAsync(Uri uri)
+        {
+            HttpClient client = new HttpClient();
+            client.MaxResponseContentBufferSize = Int32.MaxValue;
+            var bytes = await client.GetByteArrayAsync(uri);
+            var ras = new InMemoryRandomAccessStream();
+            var writer = new DataWriter(ras.GetOutputStreamAt(0));
+            writer.WriteBytes(bytes);
+            await writer.StoreAsync();
+            var bitmap = new BitmapImage();
+            bitmap.SetSource(ras);
+            return bitmap;
+        }
+
+        private async Task<Grid> RenderPhotoWithCaption(PhotoSummary photo, int index)
         {
             var image = new Image
             {
                 Margin = new Thickness(5, 0, 5, 0),
-                Source = photo.Photo,
+                Source = await DownloadImageAsync(photo.PhotoUri),
                 Height = 650,
                 Tag = index
             };
-
-            // Once the bitmap image dimenions are available, we can pre-allocate the width of the image 
-            // so that we don't have an "accordian" effect when we navigate back to the front page.
-            if (photo.Photo.PixelWidth > 0)
-            {
-                // Compute the correct pixel width
-                double ratio = (double)photo.Photo.PixelWidth / (double)photo.Photo.PixelHeight;
-                double width = 650 * ratio;
-                image.Width = Convert.ToInt32(width);
-            }
 
             var text = new TextBlock
             {
@@ -96,11 +103,11 @@ namespace MetroPix
             return grid;
         }
 
-        private void LoadPhotos(List<PhotoSummary> photos)
+        private async void LoadPhotos(List<PhotoSummary> photos)
         {
             for (int i = 0; i < photos.Count; i++)
             {
-                Photos.Children.Add(RenderPhotoWithCaption(photos[i], i));
+                Photos.Children.Add(await RenderPhotoWithCaption(photos[i], i));
             }
         }
 

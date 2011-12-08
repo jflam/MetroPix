@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Data.Json;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace MetroPix
@@ -10,7 +11,7 @@ namespace MetroPix
     public class PhotoSummary
     {
         public int Id { get; set; }
-        public BitmapImage Photo { get; set; }
+        //public BitmapImage Photo { get; set; }
         public Uri PhotoUri { get; set; }
         public string Caption { get; set; }
         public string Author { get; set; }
@@ -81,6 +82,7 @@ namespace MetroPix
 
         private List<PhotoSummary> _photos;
 
+
         // TODO: fix how we think about querying for the photos
         // - Need to have a sorted list of pictures
         // - Once we have the first picture loaded we add it to the UI
@@ -122,12 +124,12 @@ namespace MetroPix
                 double rating = photo["rating"].GetNumber();
                 int votes = Convert.ToInt32(photo["rating"].GetNumber());
                 Uri uri = GetPhotoUri(photo["image_url"].GetString(), size);
-                BitmapImage bitmap = new BitmapImage(uri);
+                //BitmapImage bitmap = await DownloadImageAsync(uri);
 
                 result.Add(new PhotoSummary
                 {
                     Id = id,
-                    Photo = bitmap,
+                    //Photo = bitmap,
                     Caption = caption,
                     Author = author,
                     PhotoUri = uri,
@@ -175,5 +177,24 @@ namespace MetroPix
         {
             get { return _singleton; }
         }
+    }
+
+    public class Experiments
+    {
+        public Task<BitmapImage> DownloadBitmapImageAsync(Uri uri)
+        {
+            var tcs = new TaskCompletionSource<BitmapImage>();
+            var image = new BitmapImage(uri);
+            image.ImageOpened += (sender, args) =>
+            {
+                tcs.SetResult(image);
+            };
+            return tcs.Task;
+        }
+
+        //public async Task<IEnumerable<BitmapImage>> LoadImages(List<Uri> uris)
+        //{
+
+        //}
     }
 }
