@@ -28,6 +28,7 @@
         </Grid>
 
         <ScrollViewer Name="Viewer" Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled" Loaded="Viewer_Loaded_1"
+                    
                       VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
                       HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
             <StackPanel Orientation="Horizontal" Name="Photos" />

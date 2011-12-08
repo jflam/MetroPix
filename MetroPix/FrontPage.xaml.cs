@@ -30,7 +30,7 @@ namespace MetroPix
                 Margin = new Thickness(5, 0, 5, 0),
                 Source = photo.Photo,
                 Height = 650,
-                Tag = photo.Id
+                Tag = index
             };
 
             // Once the bitmap image dimenions are available, we can pre-allocate the width of the image 
@@ -88,7 +88,7 @@ namespace MetroPix
 
         private async void LoadPhotos()
         {
-            var photos = await MetroPix.FiveHundredPixels.Site.Query("editors", 50, 4);
+            var photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
 
             for (int i = 0; i < photos.Count; i++)
             {
@@ -105,7 +105,7 @@ namespace MetroPix
                 if (image.Tag != null)
                 {
                     FiveHundredPixels.Site.ScrollOffset = Viewer.HorizontalOffset;
-                    Frame.Navigate(typeof(SinglePicture), image.Tag);
+                    Frame.Navigate(typeof(FullScreenPictures), image.Tag);
                 }
             }
         }
@@ -113,6 +113,7 @@ namespace MetroPix
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             // TODO: refresh button 
+            Frame.Navigate(typeof(FullScreenPictures));
         }
 
         private void Viewer_Loaded_1(object sender, RoutedEventArgs e)
