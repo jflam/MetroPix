@@ -18,9 +18,19 @@ namespace MetroPix
             InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadPhotos();
+            List<PhotoSummary> photos;
+            if ((App.Current as App).FirstRun)
+            {
+                photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
+                (App.Current as App).FirstRun = false;
+            }
+            else
+            {
+                photos = FiveHundredPixels.Site.LastQuery;
+            }
+            LoadPhotos(photos);
         }
 
         private Grid RenderPhotoWithCaption(PhotoSummary photo, int index)
@@ -86,10 +96,8 @@ namespace MetroPix
             return grid;
         }
 
-        private async void LoadPhotos()
+        private void LoadPhotos(List<PhotoSummary> photos)
         {
-            var photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
-
             for (int i = 0; i < photos.Count; i++)
             {
                 Photos.Children.Add(RenderPhotoWithCaption(photos[i], i));

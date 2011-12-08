@@ -22,6 +22,8 @@ namespace MetroPix
             InitializeComponent();
         }
 
+        public bool FirstRun = true;
+
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             var rootFrame = new Frame();

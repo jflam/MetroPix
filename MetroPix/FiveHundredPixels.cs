@@ -145,6 +145,14 @@ namespace MetroPix
         // TODO: Place to store front page state ... need to move this somewhere else
         public double ScrollOffset { get; set; }
 
+        public List<PhotoSummary> LastQuery
+        {
+            get
+            {
+                return _photos;
+            }
+        }
+
         private static FiveHundredPixels _singleton = new FiveHundredPixels();
 
         public static FiveHundredPixels Site

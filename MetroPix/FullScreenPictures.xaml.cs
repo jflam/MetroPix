@@ -13,12 +13,9 @@ namespace MetroPix
             this.InitializeComponent();
         }
 
-        private List<PhotoSummary> _photos;
-
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            _photos = await FiveHundredPixels.Site.Query("popular", 50, 4);
-            Photos.ItemsSource = _photos;
+            Photos.ItemsSource = FiveHundredPixels.Site.LastQuery;
             Photos.SelectedIndex = Convert.ToInt32(e.Parameter);
         }
 
@@ -49,7 +46,7 @@ namespace MetroPix
         {
             if (Photos.SelectedIndex >= 0)
             {
-                var id = _photos[Photos.SelectedIndex].Id;
+                var id = FiveHundredPixels.Site.LastQuery[Photos.SelectedIndex].Id;
                 var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
                 Caption.Text = photo.Caption;
                 Artist.Text = photo.Artist;
