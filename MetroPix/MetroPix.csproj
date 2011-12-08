@@ -121,6 +121,9 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TwelveScreenPictures.xaml.cs">
+      <DependentUpon>TwelveScreenPictures.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -128,6 +131,10 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="TwelveScreenPictures.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FrontPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

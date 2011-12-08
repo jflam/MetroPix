@@ -27,7 +27,7 @@ namespace MetroPix
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             var rootFrame = new Frame();
-            rootFrame.Navigate(typeof(FrontPage));
+            rootFrame.Navigate(typeof(TwelveScreenPictures));
             Window.Current.Content = rootFrame;
             Window.Current.Activate();
         }
