@@ -36,26 +36,12 @@ namespace MetroPix
             LoadPhotos(photos);
         }
 
-        private async Task<BitmapImage> DownloadImageAsync(Uri uri)
-        {
-            HttpClient client = new HttpClient();
-            client.MaxResponseContentBufferSize = Int32.MaxValue;
-            var bytes = await client.GetByteArrayAsync(uri);
-            var ras = new InMemoryRandomAccessStream();
-            var writer = new DataWriter(ras.GetOutputStreamAt(0));
-            writer.WriteBytes(bytes);
-            await writer.StoreAsync();
-            var bitmap = new BitmapImage();
-            bitmap.SetSource(ras);
-            return bitmap;
-        }
-
         private async Task<Grid> RenderPhotoWithCaption(PhotoSummary photo, int index)
         {
             var image = new Image
             {
                 Margin = new Thickness(5, 0, 5, 0),
-                Source = await DownloadImageAsync(photo.PhotoUri),
+                Source = await photo.GetPhotoAsync(),
                 Height = 650,
                 Tag = index
             };

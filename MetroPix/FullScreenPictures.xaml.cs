@@ -13,9 +13,22 @@ namespace MetroPix
             this.InitializeComponent();
         }
 
+        private async void CreateFlipViewItems(FlipView flipView)
+        {
+            foreach (var photo in FiveHundredPixels.Site.LastQuery)
+            {
+                // Awaiting an async get is exactly what is needed here
+                // However, there is an animation bug in FlipView where
+                // the animation terminates 
+                var image = new Image();
+                image.Source = await photo.GetPhotoAsync();
+                flipView.Items.Add(image);
+            }
+        }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Photos.ItemsSource = FiveHundredPixels.Site.LastQuery;
+            CreateFlipViewItems(Photos);
             Photos.SelectedIndex = Convert.ToInt32(e.Parameter);
         }
 

@@ -8,10 +8,44 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace MetroPix
 {
+    public static class AsyncHelpers
+    {
+        public static async Task<BitmapImage> GetBitmapImageAsync(this HttpClient client, Uri requestUri)
+        {
+            client.MaxResponseContentBufferSize = Int32.MaxValue;
+            var bytes = await client.GetByteArrayAsync(requestUri);
+            var ras = new InMemoryRandomAccessStream();
+            var writer = new DataWriter(ras.GetOutputStreamAt(0));
+            writer.WriteBytes(bytes);
+            await writer.StoreAsync();
+            var bitmap = new BitmapImage();
+            bitmap.SetSource(ras);
+            return bitmap;
+        }
+    }
+
     public class PhotoSummary
     {
+        private BitmapImage _photo;
         public int Id { get; set; }
-        //public BitmapImage Photo { get; set; }
+        public async Task<BitmapImage> GetPhotoAsync()
+        {
+            if (_photo == null)
+            {
+                using (var client = new HttpClient())
+                {
+                    _photo = await client.GetBitmapImageAsync(PhotoUri);                
+                }
+            }
+            return _photo;
+        }
+        public BitmapImage Photo
+        {
+            get
+            {
+                return _photo;
+            }
+        }
         public Uri PhotoUri { get; set; }
         public string Caption { get; set; }
         public string Author { get; set; }

@@ -48,13 +48,7 @@
     </Page.Resources>
 
     <Grid Background="{StaticResource PageBackgroundBrush}">
-        <FlipView Name="Photos" Tapped="Photo_Tapped_2" SelectionChanged="Photos_SelectionChanged_1">
-            <FlipView.ItemTemplate>
-                <DataTemplate>
-                    <Image Source="{Binding Photo}" />
-                </DataTemplate>
-            </FlipView.ItemTemplate>
-        </FlipView>
+        <FlipView Name="Photos" Tapped="Photo_Tapped_2" SelectionChanged="Photos_SelectionChanged_1" />
         <Canvas VerticalAlignment="Top" Height="60" Background="Black" Opacity="0.8">
             <Canvas.RenderTransform>
                 <TranslateTransform x:Name="TopMenuTransform" Y="-60" />
