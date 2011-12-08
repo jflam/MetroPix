@@ -35,6 +35,7 @@ namespace MetroPix
             }
             else
             {
+                UpdatePhotoCaption(Photos.SelectedIndex);
                 TopMenuEntryAnimation.Begin();
                 BottomMenuEntryAnimation.Begin();
             }
@@ -42,19 +43,33 @@ namespace MetroPix
             e.Handled = true;
         }
 
-        private async void Photos_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        private async void UpdatePhotoCaption(int index)
+        {
+            var id = FiveHundredPixels.Site.LastQuery[index].Id;
+            var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
+            Caption.Text = photo.Caption;
+            Artist.Text = photo.Artist;
+            Rating.Text = String.Format("{0:F1}", photo.Rating);
+            Views.Text = photo.Views.ToString();
+            Votes.Text = photo.Votes.ToString();
+            Favs.Text = photo.Votes.ToString();
+        }
+
+        private void Photos_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
             if (Photos.SelectedIndex >= 0)
             {
-                var id = FiveHundredPixels.Site.LastQuery[Photos.SelectedIndex].Id;
-                var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
-                Caption.Text = photo.Caption;
-                Artist.Text = photo.Artist;
-                Rating.Text = String.Format("{0:F1}", photo.Rating);
-                Views.Text = photo.Views.ToString();
-                Votes.Text = photo.Votes.ToString();
-                Favs.Text = photo.Votes.ToString();
+                UpdatePhotoCaption(Photos.SelectedIndex);
             }
+        }
+
+        // TODO: very inefficient -- need to design a proper data model
+        private async void Artist_Tapped_1(object sender, TappedRoutedEventArgs e)
+        {
+            var id = FiveHundredPixels.Site.LastQuery[Photos.SelectedIndex].Id;
+            var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
+            var photos = await FiveHundredPixels.Site.Query("user:" + photo.UserName, 50);
+            Frame.GoBack();
         }
     }
 }

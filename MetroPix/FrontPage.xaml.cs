@@ -118,10 +118,12 @@ namespace MetroPix
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            // TODO: refresh button 
-            Frame.Navigate(typeof(FullScreenPictures));
+            // Home button
+            var photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
+            Photos.Children.Clear();
+            LoadPhotos(photos);
         }
 
         private void Viewer_Loaded_1(object sender, RoutedEventArgs e)

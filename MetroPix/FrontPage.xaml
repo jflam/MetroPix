@@ -9,7 +9,7 @@
 
     <Page.BottomAppBar>
         <AppBar Padding="10,0,10,0">
-            <Button Click="Button_Click_1">Click me</Button>
+            <Button Click="Button_Click_1">Home</Button>
         </AppBar>
     </Page.BottomAppBar>
     

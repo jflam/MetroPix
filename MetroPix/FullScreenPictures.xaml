@@ -68,7 +68,7 @@
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <StackPanel Orientation="Vertical" Margin="80,0,0,0" Width="800" VerticalAlignment="Top">
                     <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Caption"></TextBlock>
-                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Artist"></TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Artist" Tapped="Artist_Tapped_1"></TextBlock>
                 </StackPanel>
                 <StackPanel Orientation="Vertical" Width="80" VerticalAlignment="Top">
                     <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="24" Foreground="White" Name="Rating" FontWeight="Bold"></TextBlock>
