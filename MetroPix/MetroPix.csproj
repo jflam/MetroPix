@@ -108,12 +108,22 @@
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CachingFlipView.cs" />
+    <Compile Include="FastFullScreenPictures.xaml.cs">
+      <DependentUpon>FastFullScreenPictures.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FiveHundredPixels.cs" />
     <Compile Include="FrontPage.xaml.cs">
       <DependentUpon>FrontPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="FullScreenPictures.xaml.cs">
       <DependentUpon>FullScreenPictures.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LargePhotoPage.xaml.cs">
+      <DependentUpon>LargePhotoPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LargePhotoViewer.xaml.cs">
+      <DependentUpon>LargePhotoViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="MetroStyle\LayoutAwarePage.cs" />
     <Compile Include="MetroStyle\RichTextColumns.cs" />
@@ -131,6 +141,14 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="LargePhotoPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LargePhotoViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="TwelveScreenPictures.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -140,6 +158,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="FullScreenPictures.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FastFullScreenPictures.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

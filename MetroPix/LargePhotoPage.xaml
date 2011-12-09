@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="MetroPix.TwelveScreenPictures"
+    x:Class="MetroPix.LargePhotoPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MetroPix"
@@ -8,13 +8,6 @@
     mc:Ignorable="d">
 
     <Grid Background="{StaticResource PageBackgroundBrush}">
-        <FlipView>
-            <FlipViewItem>
-                <GridView Name="Photos" Margin="300,100,0,0" SelectionMode="None" />
-            </FlipViewItem>
-            <FlipViewItem>
-                <GridView Name="Photos2" Margin="300,100,0,0" SelectionMode="None" />
-            </FlipViewItem>
-        </FlipView>
+        <local:LargePhotoViewer x:Name="Photos" />
     </Grid>
 </Page>

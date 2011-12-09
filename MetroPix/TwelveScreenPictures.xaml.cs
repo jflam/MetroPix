@@ -26,9 +26,8 @@ namespace MetroPix
             this.InitializeComponent();
         }
 
-        private async void LoadPhotos()
+        private async void LoadPhotos(GridView gridView, List<PhotoSummary> photos)
         {
-            var photos = await FiveHundredPixels.Site.Query("popular", 12, 3);
             foreach (var photo in photos)
             {
                 var image = new Image();
@@ -37,14 +36,16 @@ namespace MetroPix
                 {
                     image.Height = bitmap.PixelHeight;
                     image.Source = bitmap;
-                    Photos.Items.Add(image);
+                    gridView.Items.Add(image);
                 };
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadPhotos();
+            var photos = await FiveHundredPixels.Site.Query("popular", 6, 3);
+            LoadPhotos(Photos, photos);
+            LoadPhotos(Photos2, photos);
         }
     }
 }
