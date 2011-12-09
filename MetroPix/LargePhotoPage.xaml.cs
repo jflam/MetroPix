@@ -35,8 +35,7 @@ namespace MetroPix
             {
                 photos.Add(photo.PhotoUri);
             }
-            // TODO: make this work with multiple photos
-            Photos.SetPhotos(photos);
+            Photos.SetPhotos(photos, selectedIndex);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

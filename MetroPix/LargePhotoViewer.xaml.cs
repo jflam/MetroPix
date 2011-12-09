@@ -71,11 +71,14 @@ namespace MetroPix
             FreeImages(imageIndexToFree);
         }
 
-        public void SetPhotos(List<Uri> photos) {
+        public void SetPhotos(List<Uri> photos, int selectedIndex) {
             _photos = photos;
             CreatePhotoPlaceHolders();
-            LoadImages(0, _cacheSize + 1);
+            var startIndex = Math.Max(0, selectedIndex - _cacheSize);
+            var count = photos.Count - startIndex;
+            LoadImages(startIndex, count);
             Photos.SelectionChanged += CachingFlipView_SelectionChanged;
+            Photos.SelectedIndex = selectedIndex;
         }
 
         private async void UpdatePhotoCaption(int index)
