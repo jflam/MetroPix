@@ -12,7 +12,7 @@
             <Button Click="Button_Click_1">Home</Button>
         </AppBar>
     </Page.BottomAppBar>
-    
+
     <Grid Background="{StaticResource PageBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
@@ -27,11 +27,30 @@
             <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run></TextBlock>
         </Grid>
 
-        <ScrollViewer Name="Viewer" Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled" Loaded="Viewer_Loaded_1"
-                      HorizontalSnapPointsType="Optional" HorizontalSnapPointsAlignment="Near"
-                      VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
-                      HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
-            <StackPanel Orientation="Horizontal" Name="Photos" />
-        </ScrollViewer>
+        <GridView x:Name="Viewer" Grid.Row="2" SelectionMode="None" IsItemClickEnabled="True" ItemClick="OnPictureClicked">
+            <GridView.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition />
+                </TransitionCollection>
+            </GridView.Transitions>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+            <GridView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Image Margin="5,0,5,0" Height="650" Stretch="UniformToFill" Source="{Binding Photo2}" />
+                        <Canvas Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="5,0,5,0" Height="60" Opacity="0.8">
+                            <StackPanel>
+                                <TextBlock Margin="10,0,0,0" FontFamily="Segoe UI" FontSize="24" FontWeight="Bold" Foreground="White" Text="{Binding Caption}"/>
+                                <TextBlock Margin="10,0,0,0" FontFamily="Segoe UI" FontSize="12" Foreground="White" Text="{Binding Author}"/>
+                            </StackPanel>
+                        </Canvas>
+                    </Grid>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
     </Grid>
 </Page>

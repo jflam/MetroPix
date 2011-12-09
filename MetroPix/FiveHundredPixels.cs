@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
 namespace MetroPix
@@ -44,6 +45,13 @@ namespace MetroPix
             get
             {
                 return _photo;
+            }
+        }
+        public ImageSource Photo2
+        {
+            get
+            {
+                return new BitmapImage(PhotoUri);
             }
         }
         public Uri PhotoUri { get; set; }
