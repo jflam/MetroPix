@@ -108,10 +108,6 @@
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachingFlipView.cs" />
-    <Compile Include="FastFullScreenPictures.xaml.cs">
-      <DependentUpon>FastFullScreenPictures.xaml</DependentUpon>
-    </Compile>
     <Compile Include="FiveHundredPixels.cs" />
     <Compile Include="FrontPage.xaml.cs">
       <DependentUpon>FrontPage.xaml</DependentUpon>
@@ -158,10 +154,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="FullScreenPictures.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FastFullScreenPictures.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
