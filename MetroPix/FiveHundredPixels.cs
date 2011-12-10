@@ -33,7 +33,7 @@ namespace MetroPix
             if (_photo == null)
             {
                 //_photo = await NetworkManager.Current.GetImage(PhotoUri);
-                _photo = await NetworkManager.Current.AwesomeRead(PhotoUri);
+                _photo = await NetworkManager.Current.GetBitmapImageAsync(PhotoUri);
             }
             return _photo;
         }
@@ -107,7 +107,7 @@ namespace MetroPix
                 requestUri = String.Format(GET_PHOTOS_API, collection, 1, CONSUMER_KEY, count);
             }
 
-            var json = await NetworkManager.Current.GetString(new Uri(requestUri));
+            var json = await NetworkManager.Current.GetStringAsync(new Uri(requestUri));
             var photos = JsonObject.Parse(json)["photos"].GetArray();
             var result = new List<PhotoSummary>();
             for (uint i = 0; i < photos.Count; i++)
@@ -140,7 +140,7 @@ namespace MetroPix
         public async Task<PhotoDetails> GetFullSizePhoto(int id)
         {
             var requestUri = String.Format(GET_PHOTO_API, id, 4, CONSUMER_KEY);
-            var json = await NetworkManager.Current.GetString(new Uri(requestUri));
+            var json = await NetworkManager.Current.GetStringAsync(new Uri(requestUri));
             var photo = JsonObject.Parse(json);
             var result = new PhotoDetails
             {

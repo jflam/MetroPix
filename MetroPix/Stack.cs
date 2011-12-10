@@ -37,50 +37,12 @@ namespace MetroPix
             }
             return default(T);
         }
-        
-        private int GetContentLength(HttpResponseMessage response)
-        {
-            int contentLength = MAX_PHOTO_SIZE;
-            IEnumerable<string> values;
-            if (response.Headers.TryGetValues("content-length", out values))
-            {
-                int count = 0;
-                foreach (var value in values)
-                {
-                    contentLength = Convert.ToInt32(value);
-                    if (contentLength > MAX_PHOTO_SIZE)
-                        throw new InvalidOperationException(String.Format("Trying to download an image of that is {0} bytes; exceeds limit of {1}", contentLength, MAX_PHOTO_SIZE));
 
-                    count++;
-                }
-                Debug.Assert(count == 1);
-            }
-            return contentLength;
-        }
+        private const uint BUFFER_SIZE = 65536; // TODO: optimize this later -- default max buffer is 64K so this may be reasonable
 
-        private async Task<byte[]> GetByteArrayAsync(Uri uri)
-        {
-            using (var client = new HttpClient())
-            {
-                var request = new HttpRequestMessage();
-                request.RequestUri = uri;
-                Stream stream = await client.GetStreamAsync(uri);
-                BitmapImage bitmap = new BitmapImage();
-                //bitmap.SetSource(stream.AsInputStr);
-
-                //client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead
-                var response = await client.GetAsync(uri);
-                client.MaxResponseContentBufferSize = GetContentLength(response);
-                return await client.GetByteArrayAsync(uri);
-            }
-        }
-
-        private const uint BUFFER_SIZE = 65536;
-
-        // TODO: promote this to be a regular function
-        // TODO: offer the right kind of caching option here -- we need to cache the bytes of the images, not the images themselves
-        // we need to aggressively dump images from memory
-        public async Task<BitmapImage> AwesomeRead(Uri uri)
+        // Read the raw bytes from uri into an InMemoryRandomAccessStream. This is a basic building block 
+        // function that we will use for the caching infrastructure which will be implemented later.
+        private async Task<IRandomAccessStream> GetRawBitmapIntoInMemoryRandomAccessStream(Uri uri)
         {
             using (var client = new HttpClient())
             {
@@ -88,61 +50,45 @@ namespace MetroPix
                 var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
                 var stream = await response.Content.ReadAsStreamAsync();
                 var inputStream = stream.AsInputStream();
-                var reader = new DataReader(inputStream);
                 var ras = new InMemoryRandomAccessStream();
-                var writer = new DataWriter(ras.GetOutputStreamAt(0));
-                uint bytesLoaded = await reader.LoadAsync(BUFFER_SIZE);
-                do
+                using (var reader = new DataReader(inputStream)) 
                 {
-                    _bytesConsumed += bytesLoaded;
-                    writer.WriteBuffer(reader.ReadBuffer(bytesLoaded));
-                    if (bytesLoaded < BUFFER_SIZE)
+                    using (var writer = new DataWriter(ras.GetOutputStreamAt(0)))
                     {
-                        break;
+                        uint bytesLoaded = await reader.LoadAsync(BUFFER_SIZE);
+                        do
+                        {
+                            _bytesConsumed += bytesLoaded;
+                            writer.WriteBuffer(reader.ReadBuffer(bytesLoaded));
+                            if (bytesLoaded < BUFFER_SIZE)
+                            {
+                                break;
+                            }
+                            bytesLoaded = await reader.LoadAsync(BUFFER_SIZE);
+                        } while (true);
+                        await writer.StoreAsync();
                     }
-                    bytesLoaded = await reader.LoadAsync(BUFFER_SIZE);
-                } while (true);
-                await writer.StoreAsync();
-                var bitmapImage = new BitmapImage();
-                bitmapImage.SetSource(ras);
-                return bitmapImage;
-            }
-        }
-
-        private async Task<String> GetStringAsync(Uri uri)
-        {
-            using (var client = new HttpClient())
-            {
-                return await client.GetStringAsync(uri);
-            }
-        }
-
-        private async Task<IRandomAccessStream> CopyByteArrayToRandomAccessStream(byte[] bytes)
-        {
-            using (var ras = new InMemoryRandomAccessStream())
-            {
-                
-                using (var writer = new DataWriter(ras.GetOutputStreamAt(0)))
-                {
-                    writer.WriteBytes(bytes);
-                    await writer.StoreAsync();
-                    return ras;
                 }
+                return ras;
             }
         }
 
-        public async Task<BitmapImage> GetImage(Uri uri)
+        public async Task<BitmapImage> GetBitmapImageAsync(Uri uri)
         {
-            var bytes = await RetryOnFault(() => GetByteArrayAsync(uri));
-            _bytesConsumed += (uint)bytes.Length;
-            var bitmap = new BitmapImage();
-            bitmap.SetSource(await CopyByteArrayToRandomAccessStream(bytes));
-            return bitmap;
+            var bitmapImage = new BitmapImage();
+            bitmapImage.SetSource(await GetRawBitmapIntoInMemoryRandomAccessStream(uri));
+            return bitmapImage;
         }
 
-        public async Task<string> GetString(Uri uri)
+        public async Task<string> GetStringAsync(Uri uri)
         {
-            return await RetryOnFault(() => GetStringAsync(uri));
+            return await RetryOnFault(async () =>
+            {
+                using (var client = new HttpClient())
+                {
+                    return await client.GetStringAsync(uri);
+                }
+            });
         }
 
         public uint BytesConsumed { get { return _bytesConsumed; } }
