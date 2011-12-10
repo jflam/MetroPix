@@ -32,10 +32,8 @@ namespace MetroPix
         {
             if (_photo == null)
             {
-                using (var client = new HttpClient())
-                {
-                    _photo = await client.GetBitmapImageAsync(PhotoUri);                
-                }
+                //_photo = await NetworkManager.Current.GetImage(PhotoUri);
+                _photo = await NetworkManager.Current.AwesomeRead(PhotoUri);
             }
             return _photo;
         }
@@ -90,44 +88,8 @@ namespace MetroPix
             return new Uri(photoUri);
         }
 
-        private async Task<string> SubmitRequest(string url)
-        {
-            int i = 0;
-            while (true)
-            {
-                try
-                {
-                    return await _client.GetStringAsync(url);
-                }
-                catch (Exception e)
-                {
-                    i++;
-                    if (i < 5)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        throw e;
-                    }
-                }
-            }
-        }
-
         private List<PhotoSummary> _photos;
 
-
-        // TODO: fix how we think about querying for the photos
-        // - Need to have a sorted list of pictures
-        // - Once we have the first picture loaded we add it to the UI
-        // - Once we have the next picture loaded we add it to the UI
-        // - Need to have a mechanism to correlate the index of the request with the photo
-        // - When that photo == current index we append to the list
-        // - Do we need to fire events from here when we get a new photo in the sequence?
-        // - We hide the out of order nature from the caller?
-        // - What happens with a timeout?
-
-        // TODO: paging
         public async Task<List<PhotoSummary>> Query(string collection, int count = 20, int size = 4)
         {
             // If collection is user:<user_name> or user_friends:<user_name> or user_favorites:<user_name>
@@ -145,7 +107,7 @@ namespace MetroPix
                 requestUri = String.Format(GET_PHOTOS_API, collection, 1, CONSUMER_KEY, count);
             }
 
-            var json = await SubmitRequest(requestUri);
+            var json = await NetworkManager.Current.GetString(new Uri(requestUri));
             var photos = JsonObject.Parse(json)["photos"].GetArray();
             var result = new List<PhotoSummary>();
             for (uint i = 0; i < photos.Count; i++)
@@ -178,7 +140,7 @@ namespace MetroPix
         public async Task<PhotoDetails> GetFullSizePhoto(int id)
         {
             var requestUri = String.Format(GET_PHOTO_API, id, 4, CONSUMER_KEY);
-            var json = await SubmitRequest(requestUri);
+            var json = await NetworkManager.Current.GetString(new Uri(requestUri));
             var photo = JsonObject.Parse(json);
             var result = new PhotoDetails
             {
@@ -225,10 +187,5 @@ namespace MetroPix
             };
             return tcs.Task;
         }
-
-        //public async Task<IEnumerable<BitmapImage>> LoadImages(List<Uri> uris)
-        //{
-
-        //}
     }
 }
