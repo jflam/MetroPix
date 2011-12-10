@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
@@ -16,13 +17,18 @@ namespace MetroPix
 {
     public sealed partial class FrontPage : Page
     {
+        ObservableCollection<PhotoSummary> _boundPhotos;
+
         public FrontPage()
         {
             InitializeComponent();
+            _boundPhotos = new ObservableCollection<PhotoSummary>();
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
+            Viewer.ItemsSource = _boundPhotos;
+
             List<PhotoSummary> photos;
             if ((App.Current as App).FirstRun)
             {
@@ -36,9 +42,16 @@ namespace MetroPix
             LoadPhotos(photos);
         }
 
-        private void LoadPhotos(List<PhotoSummary> photos)
+        async private void LoadPhotos(List<PhotoSummary> photos)
         {
-            Viewer.ItemsSource = photos;
+            foreach (var photo in photos)
+            {
+                var bmp = await photo.GetPhotoAsync();
+                photo.Width = bmp.PixelWidth;
+                photo.Height = bmp.PixelHeight;
+
+                _boundPhotos.Add(photo);
+            }
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)

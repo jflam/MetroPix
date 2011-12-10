@@ -20,6 +20,7 @@ namespace MetroPix
             writer.WriteBytes(bytes);
             await writer.StoreAsync();
             var bitmap = new BitmapImage();
+            bitmap.DecodePixelHeight = 650;
             bitmap.SetSource(ras);
             return bitmap;
         }
@@ -59,6 +60,8 @@ namespace MetroPix
         public string Author { get; set; }
         public int Votes { get; set; }
         public double Rating { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
     }
 
     public class PhotoDetails
