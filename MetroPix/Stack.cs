@@ -111,9 +111,12 @@ namespace MetroPix
 
         public async Task<BitmapImage> GetBitmapImageAsync(Uri uri)
         {
-            var bitmapImage = new BitmapImage();
-            bitmapImage.SetSource(await GetRawBitmapIntoInMemoryRandomAccessStream(uri));
-            return bitmapImage;
+            using (var ras = await GetRawBitmapIntoInMemoryRandomAccessStream(uri))
+            {
+                var bitmapImage = new BitmapImage();
+                bitmapImage.SetSource(ras);
+                return bitmapImage;
+            }
         }
 
         public ulong BytesConsumed { get { return _bytesConsumed; } }

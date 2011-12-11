@@ -40,19 +40,18 @@ namespace MetroPix
             {
                 var uri = _photos[i];
                 var bitmapImage = await NetworkManager.Current.GetBitmapImageAsync(uri);
-                var image = Photos.Items[i] as Image;
+                var image = new Image();
                 image.Source = bitmapImage;
+                Photos.Items[i] = image;
             }
         }
 
         private void FreeImages(int index)
         {
-            if (index == -1)
+            if (index >= 0)
             {
-                return;
-            }
-            else
-            {
+                // Replace existing item with a new Image ... GC will eventually clean up the original Image? 
+                // It appears that I have a memory leak here though...
                 Photos.Items[index] = new Image();
             }
         }
