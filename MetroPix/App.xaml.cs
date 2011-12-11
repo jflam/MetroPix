@@ -14,8 +14,8 @@ namespace MetroPix
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             var rootFrame = new Frame();
-            await FiveHundredPixels.Site.Query("editors", 50);
-            rootFrame.Navigate(typeof(LargePhotoPage));
+            await FiveHundredPixels.Site.Query("editors", 20);
+            rootFrame.Navigate(typeof(FrontPage));
             Window.Current.Content = rootFrame;
             Window.Current.Activate();
         }

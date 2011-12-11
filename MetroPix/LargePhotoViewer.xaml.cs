@@ -16,7 +16,7 @@ namespace MetroPix
 
         private int _cacheSize = 3;
         private List<Uri> _photos;
-        private int _currentIndex = 0;
+        private int _currentIndex = -1;
 
         private void CreatePhotoPlaceHolders()
         {
@@ -52,6 +52,7 @@ namespace MetroPix
             {
                 // Replace existing item with a new Image ... GC will eventually clean up the original Image? 
                 // It appears that I have a memory leak here though...
+                //(Photos.Items[index] as Image).Source = null;
                 Photos.Items[index] = new Image();
             }
         }
