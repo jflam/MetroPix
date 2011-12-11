@@ -21,19 +21,9 @@ namespace MetroPix
             InitializeComponent();
         }
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            List<PhotoSummary> photos;
-            if ((App.Current as App).FirstRun)
-            {
-                photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
-                (App.Current as App).FirstRun = false;
-            }
-            else
-            {
-                photos = FiveHundredPixels.Site.LastQuery;
-            }
-            LoadPhotos(photos);
+            LoadPhotos(FiveHundredPixels.Site.LastQuery);
         }
 
         private async Task<Grid> RenderPhotoWithCaption(PhotoSummary photo, int index)
@@ -114,7 +104,7 @@ namespace MetroPix
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             // Home button
-            var photos = await MetroPix.FiveHundredPixels.Site.Query("popular", 50, 4);
+            var photos = await MetroPix.FiveHundredPixels.Site.Query("editors", 50, 4);
             Photos.Children.Clear();
             LoadPhotos(photos);
         }

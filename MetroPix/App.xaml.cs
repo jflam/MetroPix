@@ -11,12 +11,11 @@ namespace MetroPix
             InitializeComponent();
         }
 
-        public bool FirstRun = true;
-
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             var rootFrame = new Frame();
-            rootFrame.Navigate(typeof(FrontPage));
+            await FiveHundredPixels.Site.Query("editors", 50);
+            rootFrame.Navigate(typeof(LargePhotoPage));
             Window.Current.Content = rootFrame;
             Window.Current.Activate();
         }
