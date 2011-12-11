@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace MetroPix
 {
@@ -13,7 +14,7 @@ namespace MetroPix
             this.InitializeComponent();
         }
 
-        private int _cacheSize = 1;
+        private int _cacheSize = 3;
         private List<Uri> _photos;
         private int _currentIndex = 0;
 
@@ -30,15 +31,17 @@ namespace MetroPix
             if (index == -1)
                 return;
 
+            if (index + count > _photos.Count)
+            {
+                count = _photos.Count - index;
+            }
+
             for (int i = index; i < index + count; i++)
             {
-                using (var client = new HttpClient())
-                {
-                    var uri = _photos[i];
-                    var bitmapImage = await NetworkManager.Current.GetBitmapImageAsync(uri);
-                    var image = Photos.Items[i] as Image;
-                    image.Source = bitmapImage;
-                }
+                var uri = _photos[i];
+                var bitmapImage = await NetworkManager.Current.GetBitmapImageAsync(uri);
+                var image = Photos.Items[i] as Image;
+                image.Source = bitmapImage;
             }
         }
 
@@ -50,8 +53,7 @@ namespace MetroPix
             }
             else
             {
-                var image = Photos.Items[index] as Image;
-                image.Source = null;
+                Photos.Items[index] = new Image();
             }
         }
 
@@ -75,7 +77,7 @@ namespace MetroPix
             _photos = photos;
             CreatePhotoPlaceHolders();
             var startIndex = Math.Max(0, selectedIndex - _cacheSize);
-            var count = photos.Count - startIndex;
+            var count = _cacheSize * 2 + 1;
             LoadImages(startIndex, count);
             Photos.SelectionChanged += CachingFlipView_SelectionChanged;
             Photos.SelectedIndex = selectedIndex;
