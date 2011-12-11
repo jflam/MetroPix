@@ -35,7 +35,7 @@ namespace MetroPix
                 using (var client = new HttpClient())
                 {
                     var uri = _photos[i];
-                    var bitmapImage = await client.GetBitmapImageAsync(uri);
+                    var bitmapImage = await NetworkManager.Current.GetBitmapImageAsync(uri);
                     var image = Photos.Items[i] as Image;
                     image.Source = bitmapImage;
                 }

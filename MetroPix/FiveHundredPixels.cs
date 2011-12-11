@@ -8,22 +8,6 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace MetroPix
 {
-    public static class AsyncHelpers
-    {
-        public static async Task<BitmapImage> GetBitmapImageAsync(this HttpClient client, Uri requestUri)
-        {
-            client.MaxResponseContentBufferSize = Int32.MaxValue;
-            var bytes = await client.GetByteArrayAsync(requestUri);
-            var ras = new InMemoryRandomAccessStream();
-            var writer = new DataWriter(ras.GetOutputStreamAt(0));
-            writer.WriteBytes(bytes);
-            await writer.StoreAsync();
-            var bitmap = new BitmapImage();
-            bitmap.SetSource(ras);
-            return bitmap;
-        }
-    }
-
     public class PhotoSummary
     {
         private BitmapImage _photo;
@@ -32,7 +16,6 @@ namespace MetroPix
         {
             if (_photo == null)
             {
-                //_photo = await NetworkManager.Current.GetImage(PhotoUri);
                 _photo = await NetworkManager.Current.GetBitmapImageAsync(PhotoUri);
             }
             return _photo;
@@ -120,12 +103,10 @@ namespace MetroPix
                 double rating = photo["rating"].GetNumber();
                 int votes = Convert.ToInt32(photo["rating"].GetNumber());
                 Uri uri = GetPhotoUri(photo["image_url"].GetString(), size);
-                //BitmapImage bitmap = await DownloadImageAsync(uri);
 
                 result.Add(new PhotoSummary
                 {
                     Id = id,
-                    //Photo = bitmap,
                     Caption = caption,
                     Author = author,
                     PhotoUri = uri,

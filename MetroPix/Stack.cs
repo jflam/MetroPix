@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
@@ -19,7 +20,7 @@ namespace MetroPix
     {
         public const int MAX_PHOTO_SIZE = 100000000; // Surely 100MB is enough for everyone? :)
 
-        private uint _bytesConsumed;
+        private ulong _bytesConsumed;
 
         private static async Task<T> RetryOnFault<T>(Func<Task<T>> function, int maxRetries = 5)
         {
@@ -46,9 +47,7 @@ namespace MetroPix
         {
             using (var client = new HttpClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, uri);
-                var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-                var stream = await response.Content.ReadAsStreamAsync();
+                var stream = await client.GetStreamAsync(uri);
                 var inputStream = stream.AsInputStream();
                 var ras = new InMemoryRandomAccessStream();
                 using (var reader = new DataReader(inputStream)) 
@@ -73,6 +72,39 @@ namespace MetroPix
             }
         }
 
+        // The .NET buffer size in ReadAsync is 4K, so we read into a buffer that grows in 4K increments
+        private const int STREAM_BUFFER_SIZE = 4096;
+
+        public async Task<string> GetStringAsync(Uri uri)
+        {
+            int bufferSize = STREAM_BUFFER_SIZE;
+            var buffer = new byte[bufferSize];
+            int requestBytesConsumed = 0;
+            using (var client = new HttpClient())
+            {
+                using (var stream = await client.GetStreamAsync(uri))
+                {
+                    var bytesLoaded = await stream.ReadAsync(buffer, 0, bufferSize);
+                    do
+                    {
+                        requestBytesConsumed += bytesLoaded;
+                        if (requestBytesConsumed < bufferSize)
+                        {
+                            break;
+                        }
+                        byte[] newBuffer = new byte[bufferSize + STREAM_BUFFER_SIZE];
+                        Buffer.BlockCopy(buffer, 0, newBuffer, 0, bufferSize);
+                        buffer = newBuffer;
+                        bytesLoaded = await stream.ReadAsync(buffer, bufferSize, STREAM_BUFFER_SIZE);
+                        bufferSize += STREAM_BUFFER_SIZE;
+                    } while (true);
+                    _bytesConsumed += (ulong)requestBytesConsumed;
+                    // TODO: how do I know for sure what character encoding is being used here? Do we inspect headers for this?
+                    return Encoding.UTF8.GetString(buffer, 0, requestBytesConsumed);
+                }
+            }
+        }
+
         public async Task<BitmapImage> GetBitmapImageAsync(Uri uri)
         {
             var bitmapImage = new BitmapImage();
@@ -80,18 +112,7 @@ namespace MetroPix
             return bitmapImage;
         }
 
-        public async Task<string> GetStringAsync(Uri uri)
-        {
-            return await RetryOnFault(async () =>
-            {
-                using (var client = new HttpClient())
-                {
-                    return await client.GetStringAsync(uri);
-                }
-            });
-        }
-
-        public uint BytesConsumed { get { return _bytesConsumed; } }
+        public ulong BytesConsumed { get { return _bytesConsumed; } }
 
         private static NetworkManager _networkManager;
 
