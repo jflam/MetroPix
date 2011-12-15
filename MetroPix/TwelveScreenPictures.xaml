@@ -17,4 +17,10 @@
             </FlipViewItem>
         </FlipView>
     </Grid>
+
+    <Page.BottomAppBar>
+        <AppBar Padding="10,0,10,0">
+            <Button Click="GoHome" HorizontalAlignment="Left">Home</Button>
+        </AppBar>
+    </Page.BottomAppBar>
 </Page>

@@ -73,34 +73,51 @@ namespace MetroPix
             }
         }
 
+        // This is the initial size of the buffer used to read bytes into 
+        private const int INITIAL_BUFFER_SIZE = 8192; 
+
         // The .NET buffer size in ReadAsync is 4K, so we read into a buffer that grows in 4K increments
         private const int STREAM_BUFFER_SIZE = 4096;
+
+        // align to 4K buffer boundary
+        private const int BUFFER_MASK = Int32.MaxValue - (STREAM_BUFFER_SIZE - 1);
+
+        private byte[] ExpandBuffer(byte[] buffer, int size)
+        {
+            // Round up to the next STREAM_BUFFER boundary
+            int bufferSize = (buffer.Length & BUFFER_MASK) + STREAM_BUFFER_SIZE;
+            byte[] result = new byte[bufferSize + size];
+            Buffer.BlockCopy(buffer, 0, result, 0, buffer.Length);
+            return result;
+        }
 
         public async Task<String> GetStringAsync(Uri uri)
         {
             return await RetryOnFault(async () =>
             {
-                int bufferSize = STREAM_BUFFER_SIZE;
-                var buffer = new byte[bufferSize];
-                int requestBytesConsumed = 0;
+                var buffer = new byte[INITIAL_BUFFER_SIZE];
+                int bytesLoaded = 0;
                 using (var client = new HttpClient())
                 {
                     using (var stream = await client.GetStreamAsync(uri))
                     {
-                        var bytesLoaded = await stream.ReadAsync(buffer, 0, bufferSize);
-                        do
+                        var requestBytesConsumed = await stream.ReadAsync(buffer, 0, STREAM_BUFFER_SIZE);
+                        if (requestBytesConsumed > 0)
                         {
-                            requestBytesConsumed += bytesLoaded;
-                            if (requestBytesConsumed < bufferSize)
+                            while(true)
                             {
-                                break;
-                            }
-                            byte[] newBuffer = new byte[bufferSize + STREAM_BUFFER_SIZE];
-                            Buffer.BlockCopy(buffer, 0, newBuffer, 0, bufferSize);
-                            buffer = newBuffer;
-                            bytesLoaded = await stream.ReadAsync(buffer, bufferSize, STREAM_BUFFER_SIZE);
-                            bufferSize += STREAM_BUFFER_SIZE;
-                        } while (true);
+                                if (buffer.Length - requestBytesConsumed < STREAM_BUFFER_SIZE)
+                                {
+                                    buffer = ExpandBuffer(buffer, STREAM_BUFFER_SIZE);
+                                }
+                                bytesLoaded = await stream.ReadAsync(buffer, requestBytesConsumed, STREAM_BUFFER_SIZE);
+                                if (bytesLoaded == 0)
+                                {
+                                    break;
+                                }
+                                requestBytesConsumed += bytesLoaded;
+                            };
+                        }
                         _bytesConsumed += (ulong)requestBytesConsumed;
                         // TODO: how do I know for sure what character encoding is being used here? Do we inspect headers for this?
                         return Encoding.UTF8.GetString(buffer, 0, requestBytesConsumed);
