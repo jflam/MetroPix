@@ -49,26 +49,8 @@ namespace MetroPix
             using (var client = new HttpClient())
             {
                 var stream = await client.GetStreamAsync(uri);
-                var inputStream = stream.AsInputStream();
                 var ras = new InMemoryRandomAccessStream();
-                using (var reader = new DataReader(inputStream)) 
-                {
-                    using (var writer = new DataWriter(ras.GetOutputStreamAt(0)))
-                    {
-                        uint bytesLoaded = await reader.LoadAsync(BUFFER_SIZE);
-                        do
-                        {
-                            _bytesConsumed += bytesLoaded;
-                            writer.WriteBuffer(reader.ReadBuffer(bytesLoaded));
-                            if (bytesLoaded < BUFFER_SIZE)
-                            {
-                                break;
-                            }
-                            bytesLoaded = await reader.LoadAsync(BUFFER_SIZE);
-                        } while (true);
-                        await writer.StoreAsync();
-                    }
-                }
+                await stream.CopyToAsync(ras.GetOutputStreamAt(0).AsStreamForWrite());
                 return ras;
             }
         }
