@@ -23,7 +23,8 @@ namespace MetroPix
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadPhotos(FiveHundredPixels.Site.LastQuery);
+            LoadPhotos(RedditImporter.Site.LastQuery);
+            //LoadPhotos(FiveHundredPixels.Site.LastQuery);
         }
 
         private async Task<Grid> RenderPhotoWithCaption(PhotoSummary photo, int index)
