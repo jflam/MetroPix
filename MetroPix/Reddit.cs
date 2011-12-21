@@ -8,10 +8,71 @@ using HtmlAgilityPack;
 
 namespace MetroPix
 {
-    public class RedditImporter
+    public class ImageImporter
     {
-        private List<PhotoSummary> _photos;
+        protected List<PhotoSummary> _photos;
 
+        public List<PhotoSummary> LastQuery
+        {
+            get
+            {
+                return _photos;
+            }
+        }
+    }
+
+    public class ImgurImporter : ImageImporter
+    {
+        private List<PhotoSummary> Parse(string html)
+        {
+            var result = new List<PhotoSummary>();
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            foreach (var element in doc.DocumentNode.DescendantNodes())
+            {
+                if (element.Name == "img")
+                {
+                    var href = element.GetAttributeValue("src", String.Empty);
+                    if (!String.IsNullOrEmpty(href))
+                    {
+                        // TODO: bug in html agility pack in parsing attribute names with dashes: original-title becomes title
+                        var title = element.GetAttributeValue("title", string.Empty);
+                        var attrs = element.Attributes;
+                        var index = href.LastIndexOf("b.jpg");
+                        if (index > 0)
+                        {
+                            var photoUri = new Uri(href.Substring(0, index) + ".jpg");
+                            var photo = new PhotoSummary
+                            {
+                                Author = "todo",
+                                PhotoUri = photoUri,
+                                Caption = title
+                            };
+                            result.Add(photo);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        public async Task<List<PhotoSummary>> Query(Uri uri)
+        {
+            var html = await NetworkManager.Current.GetStringAsync(uri);
+            _photos = Parse(html);
+            return _photos;
+        }
+
+        private static ImgurImporter _singleton = new ImgurImporter();
+
+        public static ImgurImporter Site
+        {
+            get { return _singleton; }
+        }
+    }
+
+    public class RedditImporter : ImageImporter
+    {
         private List<PhotoSummary> Parse(string html)
         {
             var result = new List<PhotoSummary>();
@@ -64,14 +125,6 @@ namespace MetroPix
             var html = await NetworkManager.Current.GetStringAsync(uri);
             _photos = Parse(html);
             return _photos;
-        }
-
-        public List<PhotoSummary> LastQuery
-        {
-            get
-            {
-                return _photos;
-            }
         }
 
         private static RedditImporter _singleton = new RedditImporter();

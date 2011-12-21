@@ -23,7 +23,8 @@ namespace MetroPix
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadPhotos(RedditImporter.Site.LastQuery);
+            LoadPhotos(ImgurImporter.Site.LastQuery);
+            //LoadPhotos(RedditImporter.Site.LastQuery);
             //LoadPhotos(FiveHundredPixels.Site.LastQuery);
         }
 
