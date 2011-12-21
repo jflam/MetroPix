@@ -15,7 +15,7 @@ namespace MetroPix
         {
             var rootFrame = new Frame();
             await FiveHundredPixels.Site.Query("popular", 20);
-            rootFrame.Navigate(typeof(FrontPage));
+            rootFrame.Navigate(typeof(SinglePhotoPage));
             Window.Current.Content = rootFrame;
             Window.Current.Activate();
         }

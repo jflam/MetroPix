@@ -1,0 +1,44 @@
+﻿<Page
+    x:Class="MetroPix.SinglePhotoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MetroPix"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.TopAppBar>
+        <AppBar Height="60" Background="Black" Opacity="0.8">
+            <TextBlock Tapped="GoBackTapped" FontFamily="Segoe UI" FontSize="36" Foreground="Silver" Margin="80,0,0,0">metro<Run Foreground="White">pix</Run></TextBlock>
+        </AppBar>    
+    </Page.TopAppBar>
+    
+    <Grid Background="{StaticResource ApplicationPageBackgroundBrush}">
+        <FlipView Name="Photos" />
+    </Grid>
+    
+    <Page.BottomAppBar>
+        <AppBar Height="100" Background="Black" Opacity="0.8">
+            <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                <StackPanel Orientation="Vertical" Margin="80,0,0,0" Width="800" VerticalAlignment="Top">
+                    <TextBlock FontFamily="Segoe UI" FontWeight="Bold" FontSize="24" Foreground="White" Name="Caption"></TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Artist" Tapped="ArtistTapped"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="80" VerticalAlignment="Top">
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="24" Foreground="White" Name="Rating" FontWeight="Bold"></TextBlock>
+                    <TextBlock HorizontalAlignment="Center" FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Rating</TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="40" VerticalAlignment="Top">
+                    <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Views"></TextBlock>
+                    <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Votes"></TextBlock>
+                    <TextBlock HorizontalAlignment="Right" FontFamily="Segoe UI" FontSize="12" Foreground="White" Name="Favs"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Width="80" Margin="5,0,0,0" VerticalAlignment="Top">
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Views</TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Votes</TextBlock>
+                    <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="Silver">Favs</TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </AppBar>
+    </Page.BottomAppBar>
+</Page>

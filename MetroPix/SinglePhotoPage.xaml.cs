@@ -1,17 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.IO;
+using System.Linq;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
 
 namespace MetroPix
 {
-    public sealed partial class LargePhotoViewer : UserControl
+    /// <summary>
+    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class SinglePhotoPage : Page
     {
-        public LargePhotoViewer()
+        public SinglePhotoPage()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            var selectedIndex = Convert.ToInt32(e.Parameter);
+            var photos = new List<Uri>();
+            foreach (var photo in FiveHundredPixels.Site.LastQuery)
+            {
+                photos.Add(photo.PhotoUri);
+            }
+            SetPhotos(photos, selectedIndex);
         }
 
         private int _cacheSize = 3;
@@ -73,7 +94,8 @@ namespace MetroPix
             FreeImages(imageIndexToFree);
         }
 
-        public void SetPhotos(List<Uri> photos, int selectedIndex) {
+        public void SetPhotos(List<Uri> photos, int selectedIndex)
+        {
             _photos = photos;
             CreatePhotoPlaceHolders();
             var startIndex = Math.Max(0, selectedIndex - _cacheSize);
@@ -114,48 +136,17 @@ namespace MetroPix
             _currentIndex = newIndex;
         }
 
-        private bool _menuVisible;
-
-        // TODO: likely replace this with AppBar functionality
-        private void PhotoTapped(object sender, TappedRoutedEventArgs e)
+        private void GoBackTapped(object sender, RoutedEventArgs args)
         {
-            if (_menuVisible)
-            {
-                TopMenuExitAnimation.Begin();
-                BottomMenuExitAnimation.Begin();
-            }
-            else
-            {
-                UpdatePhotoCaption(Photos.SelectedIndex);
-                TopMenuEntryAnimation.Begin();
-                BottomMenuEntryAnimation.Begin();
-            }
-            _menuVisible = !_menuVisible;
-            e.Handled = true;
+            Frame.GoBack();
         }
 
-        private void FireGoBack()
-        {
-            if (GoBack != null)
-            {
-                GoBack(this, EventArgs.Empty);
-            }
-        }
-
-        private void GoBackTapped(object sender, TappedRoutedEventArgs args)
-        {
-            FireGoBack();
-        }
-
-        // TODO: fix this ... need to create a new artist page and render there
-        private async void ArtistTapped(object sender, TappedRoutedEventArgs args)
+        private async void ArtistTapped(object sender, RoutedEventArgs args)
         {
             var id = FiveHundredPixels.Site.LastQuery[Photos.SelectedIndex].Id;
             var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
             var photos = await FiveHundredPixels.Site.Query("user:" + photo.UserName, 50);
-            FireGoBack();
+            Frame.GoBack();
         }
-
-        public event EventHandler<EventArgs> GoBack;
     }
 }

@@ -96,7 +96,7 @@ namespace MetroPix
                 if (image.Tag != null)
                 {
                     FiveHundredPixels.Site.ScrollOffset = Viewer.HorizontalOffset;
-                    Frame.Navigate(typeof(LargePhotoPage), image.Tag);
+                    Frame.Navigate(typeof(SinglePhotoPage), image.Tag);
                 }
             }
         }
