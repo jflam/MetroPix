@@ -1,0 +1,7 @@
+Bin/**
+obj/**
+*.user
+*.swp
+*.suo
+thumbs.db
+PerformanceLogs/**
