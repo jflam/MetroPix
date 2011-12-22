@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,18 +10,29 @@ namespace MetroPix
 {
     public static class HtmlDocumentExtensionMethods
     {
-        public static List<Uri> FindAll(this HtmlDocument doc, Func<HtmlNode, Uri> predicate) 
+        public static List<HtmlNode> FindAll(this HtmlNode node, Func<HtmlNode, bool> predicate) 
         {
-            var result = new List<Uri>();
-            foreach (var element in doc.DocumentNode.DescendantNodes())
+            var result = new List<HtmlNode>();
+            foreach (var element in node.DescendantNodes())
             {
-                Uri imageUri = predicate(element);
-                if (imageUri != null)
+                if (predicate(element))
                 {
-                    result.Add(imageUri);
+                    result.Add(element);
                 }
             }
             return result;
+        }
+
+        public static HtmlNode FindFirst(this HtmlNode node, Func<HtmlNode, bool> predicate)
+        {
+            foreach (var element in node.DescendantNodes())
+            {
+                if (predicate(element))
+                {
+                    return element;
+                }
+            }
+            return null;
         }
     }
 
@@ -43,26 +55,24 @@ namespace MetroPix
             get { return _singleton; }
         }
 
-        protected List<Uri> ExtractImagesFromHtml(string html)
+        protected List<HtmlNode> ExtractImagesFromNode(HtmlNode node)
         {
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            return doc.FindAll((node) =>
+            return node.FindAll((currentNode) =>
             {
-                if (node.Name.ToLower() == "img")
+                if (currentNode.Name.ToLower() == "img")
                 {
                     // Get the Uri and look for the pattern
-                    string src = node.GetAttributeValue("src", String.Empty);
+                    string src = currentNode.GetAttributeValue("src", String.Empty);
                     if (!String.IsNullOrEmpty(src))
                     {
                         // TODO: generalized pattern match -- can parameterize?
                         if (src.Contains("inapcache.boston.com"))
                         {
-                            return new Uri(src);
+                            return true;
                         }
                     }
                 }
-                return null;
+                return false;
             });
         }
     }
@@ -73,17 +83,29 @@ namespace MetroPix
         {
             _photos = new List<PhotoSummary>();
             var html = await NetworkManager.Current.GetStringAsync(uri);
-            List<Uri> imageUris = ExtractImagesFromHtml(html);
-            foreach (var imageUri in imageUris)
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            // Find all of the divs that contain the images
+            List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
             {
+                var classAttr = currentNode.GetAttributeValue("class", String.Empty);
+                return currentNode.Name.ToLower() == "div" && (classAttr == "bpImageTop" || classAttr == "bpBoth");
+            });
+
+            foreach (var imageBlock in imageBlocks)
+            {
+                var caption = imageBlock.FindFirst((captionNode) => { return captionNode.Name.ToLower() == "div" && captionNode.GetAttributeValue("class", String.Empty) == "bpCaption"; }).InnerText;
+                var image = imageBlock.FindFirst((imageNode) => { return imageNode.Name.ToLower() == "img" && imageNode.GetAttributeValue("src", String.Empty).Contains("inapcache.boston.com"); }).GetAttributeValue("src", String.Empty);
                 var photo = new PhotoSummary
                 {
-                    Caption = "Unknown",
-                    Author = "Unknown",
-                    PhotoUri = imageUri
+                    Author = "?",
+                    Caption = caption,
+                    PhotoUri = new Uri(image)
                 };
-                _photos.Add(photo);
+                _photos.Add(photo);                
             }
+
             return _photos;
         }
     }
@@ -99,14 +121,16 @@ namespace MetroPix
             {
                 var caption = item.Title.Text;
                 var html = item.Summary.Text;
-                List<Uri> imageUris = ExtractImagesFromHtml(html);
-                foreach (Uri imageUri in imageUris)
+                var doc = new HtmlDocument();
+                doc.LoadHtml(html);
+                List<HtmlNode> imageUris = ExtractImagesFromNode(doc.DocumentNode);
+                foreach (var imageUri in imageUris)
                 {
                     var photo = new PhotoSummary
                     {
                         Author = "todo",
                         Caption = caption,
-                        PhotoUri = imageUri
+                        PhotoUri = new Uri(imageUri.GetAttributeValue("src", String.Empty))
                     };
                     _photos.Add(photo);
                 }
