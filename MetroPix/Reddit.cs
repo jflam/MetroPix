@@ -7,6 +7,23 @@ using Windows.Web.Syndication;
 
 namespace MetroPix
 {
+    public static class HtmlDocumentExtensionMethods
+    {
+        public static List<Uri> FindAll(this HtmlDocument doc, Func<HtmlNode, Uri> predicate) 
+        {
+            var result = new List<Uri>();
+            foreach (var element in doc.DocumentNode.DescendantNodes())
+            {
+                Uri imageUri = predicate(element);
+                if (imageUri != null)
+                {
+                    result.Add(imageUri);
+                }
+            }
+            return result;
+        }
+    }
+
     public class ImageImporter<T> where T: new()
     {
         protected List<PhotoSummary> _photos;
@@ -25,33 +42,54 @@ namespace MetroPix
         {
             get { return _singleton; }
         }
+
+        protected List<Uri> ExtractImagesFromHtml(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            return doc.FindAll((node) =>
+            {
+                if (node.Name.ToLower() == "img")
+                {
+                    // Get the Uri and look for the pattern
+                    string src = node.GetAttributeValue("src", String.Empty);
+                    if (!String.IsNullOrEmpty(src))
+                    {
+                        // TODO: generalized pattern match -- can parameterize?
+                        if (src.Contains("inapcache.boston.com"))
+                        {
+                            return new Uri(src);
+                        }
+                    }
+                }
+                return null;
+            });
+        }
     }
 
-    // Generic syndication API
-    // TODO: we need a multi-stage filter!
-    // 1. Grab the RSS feed
-    // 2. Extract the item HTML
-    // 3. Extract all of the img elements
-    // 4. Apply a URI filter against each item to arrive at the list
+    public class HtmlImporter : ImageImporter<HtmlImporter>
+    {
+        public async Task<List<PhotoSummary>> Query(Uri uri)
+        {
+            _photos = new List<PhotoSummary>();
+            var html = await NetworkManager.Current.GetStringAsync(uri);
+            List<Uri> imageUris = ExtractImagesFromHtml(html);
+            foreach (var imageUri in imageUris)
+            {
+                var photo = new PhotoSummary
+                {
+                    Caption = "Unknown",
+                    Author = "Unknown",
+                    PhotoUri = imageUri
+                };
+                _photos.Add(photo);
+            }
+            return _photos;
+        }
+    }
 
     public class RssImporter : ImageImporter<RssImporter>
     {
-        private List<Uri> ExtractUris(string html, Func<HtmlNode, Uri> predicate)
-        {
-            var result = new List<Uri>();
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-            foreach (var element in doc.DocumentNode.DescendantNodes())
-            {
-                Uri imageUri = predicate(element);
-                if (imageUri != null)
-                {
-                    result.Add(imageUri);
-                }
-            }
-            return result;
-        }
-
         public async Task<List<PhotoSummary>> Query(Uri uri)
         {
             _photos = new List<PhotoSummary>();
@@ -61,24 +99,7 @@ namespace MetroPix
             {
                 var caption = item.Title.Text;
                 var html = item.Summary.Text;
-                List<Uri> imageUris = ExtractUris(html, (node) =>
-                {
-                    if (node.Name.ToLower() == "img")
-                    {
-                        // Get the Uri and look for the pattern
-                        string src = node.GetAttributeValue("src", String.Empty);
-                        if (!String.IsNullOrEmpty(src))
-                        {
-                            if (src.Contains("inapcache.boston.com"))
-                            {
-                                return new Uri(src);
-                            }
-                        }
-                    }
-                    return null;
-                });
-
-                // Dupe the title for each photo
+                List<Uri> imageUris = ExtractImagesFromHtml(html);
                 foreach (Uri imageUri in imageUris)
                 {
                     var photo = new PhotoSummary

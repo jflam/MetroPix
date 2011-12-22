@@ -15,7 +15,8 @@ namespace MetroPix
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             var rootFrame = new Frame();
-            await RssImporter.Site.Query(new Uri("http://feeds.boston.com/boston/bigpicture/index"));
+            await HtmlImporter.Site.Query(new Uri("http://www.boston.com/bigpicture/2011/12/the_year_in_pictures_part.html"));
+            //await RssImporter.Site.Query(new Uri("http://feeds.boston.com/boston/bigpicture/index"));
             //await ImgurImporter.Site.Query(new Uri("http://imgur.com/r/aww/top"));
             //await RedditImporter.Site.Query(new Uri("http://reddit.com/r/aww"));
             //await FiveHundredPixels.Site.Query("popular", 20);
