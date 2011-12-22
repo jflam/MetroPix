@@ -13,7 +13,7 @@
         </AppBar>
     </Page.BottomAppBar>
     
-    <Grid Background="{StaticResource PageBackgroundBrush}">
+    <Grid Background="{StaticResource ApplicationPageBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
