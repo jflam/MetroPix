@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-
-// Import pictures from Reddit. Uses Html Agility Pack mod.
+using Windows.Web.Syndication;
 
 namespace MetroPix
 {
-    public class ImageImporter
+    public class ImageImporter<T> where T: new()
     {
         protected List<PhotoSummary> _photos;
 
@@ -19,9 +18,83 @@ namespace MetroPix
                 return _photos;
             }
         }
+
+        private static T _singleton = new T();
+
+        public static T Site
+        {
+            get { return _singleton; }
+        }
     }
 
-    public class ImgurImporter : ImageImporter
+    // Generic syndication API
+    // TODO: we need a multi-stage filter!
+    // 1. Grab the RSS feed
+    // 2. Extract the item HTML
+    // 3. Extract all of the img elements
+    // 4. Apply a URI filter against each item to arrive at the list
+
+    public class RssImporter : ImageImporter<RssImporter>
+    {
+        private List<Uri> ExtractUris(string html, Func<HtmlNode, Uri> predicate)
+        {
+            var result = new List<Uri>();
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            foreach (var element in doc.DocumentNode.DescendantNodes())
+            {
+                Uri imageUri = predicate(element);
+                if (imageUri != null)
+                {
+                    result.Add(imageUri);
+                }
+            }
+            return result;
+        }
+
+        public async Task<List<PhotoSummary>> Query(Uri uri)
+        {
+            _photos = new List<PhotoSummary>();
+            var client = new SyndicationClient();
+            var feed = await client.RetrieveFeedAsync(uri);
+            foreach (var item in feed.Items)
+            {
+                var caption = item.Title.Text;
+                var html = item.Summary.Text;
+                List<Uri> imageUris = ExtractUris(html, (node) =>
+                {
+                    if (node.Name.ToLower() == "img")
+                    {
+                        // Get the Uri and look for the pattern
+                        string src = node.GetAttributeValue("src", String.Empty);
+                        if (!String.IsNullOrEmpty(src))
+                        {
+                            if (src.Contains("inapcache.boston.com"))
+                            {
+                                return new Uri(src);
+                            }
+                        }
+                    }
+                    return null;
+                });
+
+                // Dupe the title for each photo
+                foreach (Uri imageUri in imageUris)
+                {
+                    var photo = new PhotoSummary
+                    {
+                        Author = "todo",
+                        Caption = caption,
+                        PhotoUri = imageUri
+                    };
+                    _photos.Add(photo);
+                }
+            }
+            return _photos;
+        }
+    }
+
+    public class ImgurImporter : ImageImporter<ImgurImporter>
     {
         private List<PhotoSummary> Parse(string html)
         {
@@ -62,16 +135,9 @@ namespace MetroPix
             _photos = Parse(html);
             return _photos;
         }
-
-        private static ImgurImporter _singleton = new ImgurImporter();
-
-        public static ImgurImporter Site
-        {
-            get { return _singleton; }
-        }
     }
 
-    public class RedditImporter : ImageImporter
+    public class RedditImporter : ImageImporter<RedditImporter>
     {
         private List<PhotoSummary> Parse(string html)
         {
@@ -125,13 +191,6 @@ namespace MetroPix
             var html = await NetworkManager.Current.GetStringAsync(uri);
             _photos = Parse(html);
             return _photos;
-        }
-
-        private static RedditImporter _singleton = new RedditImporter();
-
-        public static RedditImporter Site
-        {
-            get { return _singleton; }
         }
     }
 }

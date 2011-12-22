@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 
 namespace MetroPix
@@ -23,7 +19,8 @@ namespace MetroPix
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadPhotos(ImgurImporter.Site.LastQuery);
+            LoadPhotos(RssImporter.Site.LastQuery);
+            //LoadPhotos(ImgurImporter.Site.LastQuery);
             //LoadPhotos(RedditImporter.Site.LastQuery);
             //LoadPhotos(FiveHundredPixels.Site.LastQuery);
         }
