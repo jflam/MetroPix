@@ -20,7 +20,7 @@ namespace MetroPix
         {
             var selectedIndex = Convert.ToInt32(e.Parameter);
             var photos = new List<Uri>();
-            foreach (var photo in (App.Current as App).Photos)
+            foreach (var photo in (App.Current as App).PhotoStream.Photos)
             {
                 photos.Add(photo.PhotoUri);
             }
@@ -99,7 +99,7 @@ namespace MetroPix
 
         private async void UpdatePhotoCaption(int index)
         {
-            var photos = (App.Current as App).Photos;
+            var photos = (App.Current as App).PhotoStream.Photos;
             var id = photos[index].Id;
             // TODO: better data model for photos
             var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);

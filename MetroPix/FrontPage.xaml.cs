@@ -19,7 +19,9 @@ namespace MetroPix
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            LoadPhotos((App.Current as App).Photos);
+            var photoStream = (App.Current as App).PhotoStream;
+            Title.Text = " - " + photoStream.Title;
+            LoadPhotos(photoStream.Photos);
         }
 
         private async Task<Grid> RenderPhotoWithCaption(PhotoSummary photo, int index)

@@ -24,7 +24,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="pageTitle" Margin="120,20,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run> - <Run x:Name="Title"></Run></TextBlock>
+            <TextBlock x:Name="pageTitle" Margin="120,20,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run><Run x:Name="Title" FontWeight="Light" FontSize="24"></Run></TextBlock>
         </Grid>
 
         <ScrollViewer Name="Viewer" Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled" Loaded="Viewer_Loaded_1"

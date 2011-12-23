@@ -35,18 +35,31 @@ namespace MetroPix
         }
     }
 
+    public class PhotoStream
+    {
+        public string Title { get; set; }
+        public List<PhotoSummary> Photos { get; set; }
+
+        public PhotoStream(string title, List<PhotoSummary> photos)
+        {
+            Title = title;
+            Photos = photos;
+        }
+    }
+
     public abstract class BaseSiteParser
     {
         protected abstract void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos);
 
-        public virtual async Task<List<PhotoSummary>> Parse(Uri uri)
+        public virtual async Task<PhotoStream> Parse(Uri uri)
         {
             var photos = new List<PhotoSummary>();
             var html = await NetworkManager.Current.GetStringAsync(uri);
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
+            var title = doc.DocumentNode.FindFirst((node) => node.Name.ToLower() == "title").InnerText;
             ProcessDocument(doc, photos);
-            return photos;
+            return new PhotoStream(title, photos);
         }
     }
 
@@ -64,7 +77,7 @@ namespace MetroPix
             { "www.500px.com", new FiveHunderedPixelsSiteParser() },
         };
 
-        public async Task<List<PhotoSummary>> Parse(Uri uri)
+        public async Task<PhotoStream> Parse(Uri uri)
         {
             var hostName = uri.Host.ToLower(); 
             BaseSiteParser parser = null;
