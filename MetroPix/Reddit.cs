@@ -34,7 +34,7 @@ namespace MetroPix
         }
     }
 
-    public class BaseImageImporter
+    public abstract class BaseImageImporter
     {
         protected List<HtmlNode> ExtractImagesFromNode(HtmlNode node)
         {
@@ -57,9 +57,16 @@ namespace MetroPix
             });
         }
 
-        public virtual Task<List<PhotoSummary>> Parse(Uri uri)
+        protected abstract void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos);
+
+        public virtual async Task<List<PhotoSummary>> Parse(Uri uri)
         {
-            return null;
+            var photos = new List<PhotoSummary>();
+            var html = await NetworkManager.Current.GetStringAsync(uri);
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            ProcessDocument(doc, photos);
+            return photos;
         }
     }
 
@@ -89,20 +96,16 @@ namespace MetroPix
 
     public class BigPictureImporter : BaseImageImporter
     {
-        public override async Task<List<PhotoSummary>> Parse(Uri uri)
+        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
-            var photos = new List<PhotoSummary>();
-            var html = await NetworkManager.Current.GetStringAsync(uri);
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
-
-            // Find all of the divs that contain the images
+            // Filter
             List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
             {
                 var classAttr = currentNode.GetAttributeValue("class", String.Empty);
                 return currentNode.Name.ToLower() == "div" && (classAttr == "bpImageTop" || classAttr == "bpBoth");
             });
 
+            // Build
             foreach (var imageBlock in imageBlocks)
             {
                 var caption = imageBlock.FindFirst((captionNode) => { return captionNode.Name.ToLower() == "div" && captionNode.GetAttributeValue("class", String.Empty) == "bpCaption"; }).InnerText;
@@ -113,58 +116,54 @@ namespace MetroPix
                     Caption = caption,
                     PhotoUri = new Uri(image)
                 };
-                photos.Add(photo);                
+                photos.Add(photo);
             }
-
-            return photos;
         }
     }
 
     public class FlickrImporter : BaseImageImporter
     {
-        public override Task<List<PhotoSummary>> Parse(Uri uri)
+        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
-            return base.Parse(uri);
         }
     }
 
-    // TODO: fix this
-    public class RssImporter : BaseImageImporter
-    {
-        public override async Task<List<PhotoSummary>> Parse(Uri uri)
-        {
-            var photos = new List<PhotoSummary>();
-            var client = new SyndicationClient();
-            var feed = await client.RetrieveFeedAsync(uri);
-            foreach (var item in feed.Items)
-            {
-                var caption = item.Title.Text;
-                var html = item.Summary.Text;
-                var doc = new HtmlDocument();
-                doc.LoadHtml(html);
-                List<HtmlNode> imageUris = ExtractImagesFromNode(doc.DocumentNode);
-                foreach (var imageUri in imageUris)
-                {
-                    var photo = new PhotoSummary
-                    {
-                        Author = "todo",
-                        Caption = caption,
-                        PhotoUri = new Uri(imageUri.GetAttributeValue("src", String.Empty))
-                    };
-                    photos.Add(photo);
-                }
-            }
-            return photos;
-        }
-    }
+    // TODO: revive this as a brand new class since the BaseImageImporter related types are really just HTML screen
+    // scraping types which certainly may be called from an RSS feed importer, but perhaps not?
+    //public class RssImporter : BaseImageImporter
+    //{
+    //    public override async Task<List<PhotoSummary>> Parse(Uri uri)
+    //    {
+    //        var photos = new List<PhotoSummary>();
+    //        var client = new SyndicationClient();
+    //        var feed = await client.RetrieveFeedAsync(uri);
+    //        foreach (var item in feed.Items)
+    //        {
+    //            var caption = item.Title.Text;
+    //            var html = item.Summary.Text;
+    //            var doc = new HtmlDocument();
+    //            doc.LoadHtml(html);
+    //            List<HtmlNode> imageUris = ExtractImagesFromNode(doc.DocumentNode);
+    //            foreach (var imageUri in imageUris)
+    //            {
+    //                var photo = new PhotoSummary
+    //                {
+    //                    Author = "todo",
+    //                    Caption = caption,
+    //                    PhotoUri = new Uri(imageUri.GetAttributeValue("src", String.Empty))
+    //                };
+    //                photos.Add(photo);
+    //            }
+    //        }
+    //        return photos;
+    //    }
+    //}
 
     public class ImgurImporter : BaseImageImporter
     {
-        private List<PhotoSummary> Parse(string html)
+        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
-            var result = new List<PhotoSummary>();
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
+            // TODO: convert this to use extension methods
             foreach (var element in doc.DocumentNode.DescendantNodes())
             {
                 if (element.Name == "img")
@@ -185,28 +184,19 @@ namespace MetroPix
                                 PhotoUri = photoUri,
                                 Caption = title
                             };
-                            result.Add(photo);
+                            photos.Add(photo);
                         }
                     }
                 }
             }
-            return result;
-        }
-
-        public override async Task<List<PhotoSummary>> Parse(Uri uri)
-        {
-            var html = await NetworkManager.Current.GetStringAsync(uri);
-            return Parse(html);
         }
     }
 
     public class RedditImporter : BaseImageImporter
     {
-        private List<PhotoSummary> Parse(string html)
+        // TODO: make this use extension methods FindAll and friends
+        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
-            var result = new List<PhotoSummary>();
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
             var linksTable = doc.GetElementbyId("siteTable");
             if (linksTable != null)
             {
@@ -236,7 +226,7 @@ namespace MetroPix
                                                 Caption = element.InnerText,
                                                 Author = "todo"
                                             };
-                                            result.Add(photo);
+                                            photos.Add(photo);
                                         }
                                     }
                                 }
@@ -245,14 +235,6 @@ namespace MetroPix
                     }
                 }
             }
-            return result;
-        }
-
-        // Point to a reddit and extract the picture urls
-        public override async Task<List<PhotoSummary>> Parse(Uri uri)
-        {
-            var html = await NetworkManager.Current.GetStringAsync(uri);
-            return Parse(html);
         }
     }
 }
