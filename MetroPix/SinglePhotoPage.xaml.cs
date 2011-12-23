@@ -99,7 +99,9 @@ namespace MetroPix
 
         private async void UpdatePhotoCaption(int index)
         {
-            var id = FiveHundredPixels.Site.LastQuery[index].Id;
+            var photos = (App.Current as App).Photos;
+            var id = photos[index].Id;
+            // TODO: better data model for photos
             var photo = await FiveHundredPixels.Site.GetFullSizePhoto(id);
             Caption.Text = photo.Caption;
             Artist.Text = photo.Artist;

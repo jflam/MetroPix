@@ -15,7 +15,7 @@
     
     <Grid Background="{StaticResource ApplicationPageBackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="70"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -24,14 +24,14 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="pageTitle" Margin="80,0,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run></TextBlock>
+            <TextBlock x:Name="pageTitle" Margin="120,20,0,0" Grid.Column="1" FontFamily="Segoe UI" FontSize="36" Foreground="Silver">metro<Run Foreground="White">pix</Run> - <Run x:Name="Title"></Run></TextBlock>
         </Grid>
 
         <ScrollViewer Name="Viewer" Grid.Row="2" Height="650" Tapped="ScrollViewer_Tapped_1" ZoomMode="Disabled" Loaded="Viewer_Loaded_1"
                       HorizontalSnapPointsType="Optional" HorizontalSnapPointsAlignment="Near"
                       VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" 
                       HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
-            <StackPanel Orientation="Horizontal" Name="Photos" />
+            <StackPanel Margin="120,0,40,60" Orientation="Horizontal" Name="Photos" />
         </ScrollViewer>
     </Grid>
 </Page>

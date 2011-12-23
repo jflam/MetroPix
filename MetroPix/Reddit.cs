@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Windows.Web.Syndication;
@@ -58,7 +59,8 @@ namespace MetroPix
             { "www.boston.com", new BigPictureImporter() },
             { "boston.com", new BigPictureImporter() },
             { "www.flickr.com", new FlickrImporter() },
-            { "flickr.com", new FlickrImporter() }
+            { "flickr.com", new FlickrImporter() },
+            { "imgur.com", new ImgurImporter() },
         };
 
         public async Task<List<PhotoSummary>> Parse(Uri uri)
@@ -170,33 +172,35 @@ namespace MetroPix
 
     public class ImgurImporter : BaseImageImporter
     {
+        private string CleanupCaption(string caption)
+        {
+            // Strip out entity references and HTML tags
+            return Regex.Replace(Regex.Replace(caption, @"<(.|\n)*?>", String.Empty), @"&#\d+;", String.Empty);
+        }
+
         protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
-            // TODO: convert this to use extension methods
-            foreach (var element in doc.DocumentNode.DescendantNodes())
+            // Filter
+            List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
             {
-                if (element.Name == "img")
+                var classAttr = currentNode.GetAttributeValue("class", String.Empty);
+                return currentNode.Name.ToLower() == "div" && classAttr == "post";
+            });
+
+            // Build
+            foreach (var imageBlock in imageBlocks)
+            {
+                // The image URI can be computed from the image id
+                var id = imageBlock.GetAttributeValue("id", String.Empty);
+                var url = String.Format("http://i.imgur.com/{0}.jpg", id);
+                var caption = imageBlock.FindFirst((imageNode) => { return imageNode.Name.ToLower() == "img"; }).GetAttributeValue("title", String.Empty);
+                var photo = new PhotoSummary
                 {
-                    var href = element.GetAttributeValue("src", String.Empty);
-                    if (!String.IsNullOrEmpty(href))
-                    {
-                        // TODO: bug in html agility pack in parsing attribute names with dashes: original-title becomes title
-                        var title = element.GetAttributeValue("title", string.Empty);
-                        var attrs = element.Attributes;
-                        var index = href.LastIndexOf("b.jpg");
-                        if (index > 0)
-                        {
-                            var photoUri = new Uri(href.Substring(0, index) + ".jpg");
-                            var photo = new PhotoSummary
-                            {
-                                Author = "todo",
-                                PhotoUri = photoUri,
-                                Caption = title
-                            };
-                            photos.Add(photo);
-                        }
-                    }
-                }
+                    Author = "?",
+                    Caption = CleanupCaption(caption),
+                    PhotoUri = new Uri(url)
+                };
+                photos.Add(photo);
             }
         }
     }
