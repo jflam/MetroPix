@@ -1,0 +1,28 @@
+Developer notes for MetroPix
+
+Generic URL parsing - metropix user enters on a URL, we need to:
+  - Dispatch the HTML parsing for that URL to a known parser
+  - Dispatch the HTML parsing for that URL to a default parser
+  - Offer an upsell experience(?) for key sites such as Flickr, 500px etc.
+
+Where are the URLs that make up a user's favorites stored?
+  - Simplest thing is a scrolling list of Favorites on their home page
+  - Need to have some categories - RSS feeds, Favorite photos, Favorite albums?
+
+
+While browsing a photo, we need a few other key features
+  - Add to Photos Library - download locally
+  - Add to Skydrive Library - upload to the sky?
+
+
+What are the key sites that we need to work with?
+  - 500px: the most beautiful photos are generally here
+  - The Big Picture: there are fantastic AP photos here
+
+We need some kind of searchable captioning mechanism
+  - Store metadata for pictures locally?
+  - Make that metadata searchable?
+  - Should the OS do this for us using the system indexer? Need sample
+  - Ideally would sync across multiple machines
+  - Should we use SkyDrive for this? Or should I add easy DropBox integration?
+
