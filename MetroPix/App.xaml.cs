@@ -33,7 +33,7 @@ namespace MetroPix
                 var uri = new Uri("http://" + pargs.Uri.Host + pargs.Uri.PathAndQuery);
                 await HtmlImporter.Site.Query(uri);
                 var rootFrame = new Frame();
-                rootFrame.Navigate(typeof(FrontPage));
+                rootFrame.Navigate(typeof(Home));
                 Window.Current.Content = rootFrame;
                 Window.Current.Activate();
             }
