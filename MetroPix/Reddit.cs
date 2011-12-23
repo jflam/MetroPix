@@ -35,7 +35,7 @@ namespace MetroPix
         }
     }
 
-    public abstract class BaseImageImporter
+    public abstract class BaseSiteParser
     {
         protected abstract void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos);
 
@@ -54,19 +54,20 @@ namespace MetroPix
     // delegates parsing to the approrpriate implementation.
     public class UriDispatcher
     {
-        private Dictionary<string, BaseImageImporter> _hostToParserMap = new Dictionary<string, BaseImageImporter>
+        private Dictionary<string, BaseSiteParser> _hostToParserMap = new Dictionary<string, BaseSiteParser>
         {
-            { "www.boston.com", new BigPictureImporter() },
-            { "boston.com", new BigPictureImporter() },
-            { "www.flickr.com", new FlickrImporter() },
-            { "flickr.com", new FlickrImporter() },
-            { "imgur.com", new ImgurImporter() },
+            { "www.boston.com", new BigPictureSiteParser() },
+            { "boston.com", new BigPictureSiteParser() },
+            { "www.flickr.com", new FlickrSiteParser() },
+            { "flickr.com", new FlickrSiteParser() },
+            { "imgur.com", new ImgurSiteParser() },
+            { "www.500px.com", new FiveHunderedPixelsSiteParser() },
         };
 
         public async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             var hostName = uri.Host.ToLower(); 
-            BaseImageImporter parser = null;
+            BaseSiteParser parser = null;
             if (_hostToParserMap.TryGetValue(hostName, out parser))
             {
                 return await parser.Parse(uri);
@@ -78,7 +79,7 @@ namespace MetroPix
         }
     }
 
-    public class BigPictureImporter : BaseImageImporter
+    public class BigPictureSiteParser : BaseSiteParser
     {
         protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
@@ -105,7 +106,7 @@ namespace MetroPix
         }
     }
 
-    public class FlickrImporter : BaseImageImporter
+    public class FlickrSiteParser : BaseSiteParser
     {
         // TODO: need to have a pre-processor that does the right thing based on the
         // type of page that we're looking at. Right now this is a loos processdocument
@@ -139,6 +140,74 @@ namespace MetroPix
         }
     }
 
+    public class ImgurSiteParser : BaseSiteParser
+    {
+        private string CleanupCaption(string caption)
+        {
+            // Strip out entity references and HTML tags
+            return Regex.Replace(Regex.Replace(caption, @"<(.|\n)*?>", String.Empty), @"&#\d+;", String.Empty);
+        }
+
+        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
+        {
+            // Filter
+            List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
+            {
+                var classAttr = currentNode.GetAttributeValue("class", String.Empty);
+                return currentNode.Name.ToLower() == "div" && classAttr == "post";
+            });
+
+            // Build
+            foreach (var imageBlock in imageBlocks)
+            {
+                // The image URI can be computed from the image id
+                var id = imageBlock.GetAttributeValue("id", String.Empty);
+                var url = String.Format("http://i.imgur.com/{0}.jpg", id);
+                var caption = imageBlock.FindFirst((imageNode) => { return imageNode.Name.ToLower() == "img"; }).GetAttributeValue("title", string.Empty);
+                var photo = new PhotoSummary
+                {
+                    Author = "?",
+                    Caption = CleanupCaption(caption),
+                    PhotoUri = new Uri(url)
+                };
+                photos.Add(photo);
+            }
+        }
+    }
+
+    public class FiveHunderedPixelsSiteParser : BaseSiteParser
+    {
+        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
+        {
+            // Filter
+            List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
+            {
+                var classAttr = currentNode.GetAttributeValue("class", String.Empty);
+                return currentNode.Name.ToLower() == "div" && classAttr == "thumb";
+            });
+
+            // Build
+            foreach (var imageBlock in imageBlocks)
+            {
+                // The image URI can be computed from the image id
+                var caption = imageBlock.GetAttributeValue("title", String.Empty);
+                var image = imageBlock.FindFirst((imageNode) => { return imageNode.Name.ToLower() == "img"; }).GetAttributeValue("src", String.Empty);
+
+                // The full sized pictures are 4.jpg
+                image = image.Replace("3.jpg", "4.jpg");
+
+                var photo = new PhotoSummary
+                {
+                    Author = "?",
+                    Caption = caption,
+                    PhotoUri = new Uri(image)
+                };
+                photos.Add(photo);
+            }
+        }
+    }
+    #region TODO Later
+
     // TODO: revive this as a brand new class since the BaseImageImporter related types are really just HTML screen
     // scraping types which certainly may be called from an RSS feed importer, but perhaps not?
     //public class RssImporter : BaseImageImporter
@@ -170,42 +239,8 @@ namespace MetroPix
     //    }
     //}
 
-    public class ImgurImporter : BaseImageImporter
-    {
-        private string CleanupCaption(string caption)
-        {
-            // Strip out entity references and HTML tags
-            return Regex.Replace(Regex.Replace(caption, @"<(.|\n)*?>", String.Empty), @"&#\d+;", String.Empty);
-        }
-
-        protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
-        {
-            // Filter
-            List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
-            {
-                var classAttr = currentNode.GetAttributeValue("class", String.Empty);
-                return currentNode.Name.ToLower() == "div" && classAttr == "post";
-            });
-
-            // Build
-            foreach (var imageBlock in imageBlocks)
-            {
-                // The image URI can be computed from the image id
-                var id = imageBlock.GetAttributeValue("id", String.Empty);
-                var url = String.Format("http://i.imgur.com/{0}.jpg", id);
-                var caption = imageBlock.FindFirst((imageNode) => { return imageNode.Name.ToLower() == "img"; }).GetAttributeValue("title", String.Empty);
-                var photo = new PhotoSummary
-                {
-                    Author = "?",
-                    Caption = CleanupCaption(caption),
-                    PhotoUri = new Uri(url)
-                };
-                photos.Add(photo);
-            }
-        }
-    }
-
-    public class RedditImporter : BaseImageImporter
+    // TODO: rewrite this
+    public class RedditSiteParser : BaseSiteParser
     {
         // TODO: make this use extension methods FindAll and friends
         protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
@@ -250,4 +285,5 @@ namespace MetroPix
             }
         }
     }
+    #endregion
 }
