@@ -1,40 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-
-  <Identity Name="e76e2126-47fc-4667-a374-2e5013eaa98b"
-            Publisher="CN=jflam"
-            Version="1.0.0.0" />
-
+  <Identity Name="e76e2126-47fc-4667-a374-2e5013eaa98b" Publisher="CN=jflam" Version="1.0.0.0" />
   <Properties>
     <DisplayName>MetroPix</DisplayName>
     <PublisherDisplayName>jflam</PublisherDisplayName>
-    <Logo>Images\StoreLogo.png</Logo>
+    <Logo>Assets\StoreLogo.png</Logo>
     <Description>MetroPix</Description>
   </Properties>
-
   <Prerequisites>
     <OSMinVersion>6.2</OSMinVersion>
     <OSMaxVersionTested>6.2</OSMaxVersionTested>
   </Prerequisites>
-
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
-
   <Applications>
-    <Application Id="App"
-        Executable="$targetnametoken$.exe"
-        EntryPoint="MetroPix.App">
-        <VisualElements
-            DisplayName="MetroPix"
-            Logo="Images\Logo.png"
-            SmallLogo="Images\SmallLogo.png"
-            Description="MetroPix"
-            ForegroundText="light"
-            BackgroundColor="#222222">
-            <DefaultTile ShowName="allLogos" />
-            <SplashScreen Image="Images\SplashScreen.png" />
-        </VisualElements>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="MetroPix.App">
+      <VisualElements DisplayName="MetroPix" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="MetroPix" ForegroundText="light" BackgroundColor="#222222">
+        <DefaultTile ShowName="allLogos" />
+        <SplashScreen Image="Assets\SplashScreen.png" />
+      </VisualElements>
+      <Extensions>
+        <Extension Category="windows.protocol">
+          <Protocol Name="metropix" />
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>

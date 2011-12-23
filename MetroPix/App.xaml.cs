@@ -24,5 +24,19 @@ namespace MetroPix
             Window.Current.Content = rootFrame;
             Window.Current.Activate();
         }
+
+        protected override async void OnActivated(IActivatedEventArgs args)
+        {
+            if (args.Kind == ActivationKind.Protocol)
+            {
+                ProtocolActivatedEventArgs pargs = (ProtocolActivatedEventArgs)args;
+                var uri = new Uri("http://" + pargs.Uri.Host + pargs.Uri.PathAndQuery);
+                await HtmlImporter.Site.Query(uri);
+                var rootFrame = new Frame();
+                rootFrame.Navigate(typeof(FrontPage));
+                Window.Current.Content = rootFrame;
+                Window.Current.Activate();
+            }
+        }
     }
 }
