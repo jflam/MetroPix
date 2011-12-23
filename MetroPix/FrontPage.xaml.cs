@@ -34,11 +34,12 @@ namespace MetroPix
 
             var text = new TextBlock
             {
+                TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(10, 0, 0, 0),
                 FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe UI"),
-                FontWeight = FontWeights.Bold,
+                FontWeight = FontWeights.Light,
                 Foreground = new SolidColorBrush(Colors.White),
-                FontSize = 24,
+                FontSize = 16,
                 Text = photo.Caption
             };
 
@@ -54,7 +55,7 @@ namespace MetroPix
             var left = new StackPanel
             {
                 Orientation = Orientation.Vertical,
-                Children = { text, name }
+                Children = { text } // , name }
             };
 
             var canvas = new Canvas

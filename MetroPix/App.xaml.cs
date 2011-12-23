@@ -22,7 +22,7 @@ namespace MetroPix
         {
             
             var rootFrame = new Frame();
-            Photos = await _parser.Parse(new Uri("http://boston.com/bigpicture/2011/12/the_year_in_pictures_part.html"));
+            Photos = await _parser.Parse(new Uri("http://www.boston.com/bigpicture/2011/12/the_year_in_pictures_part.html"));
             rootFrame.Navigate(typeof(FrontPage));
             Window.Current.Content = rootFrame;
             Window.Current.Activate();
@@ -36,9 +36,8 @@ namespace MetroPix
                 ProtocolActivatedEventArgs pargs = (ProtocolActivatedEventArgs)args;
                 var uri = new Uri("http://" + pargs.Uri.Host + pargs.Uri.PathAndQuery);
                 Photos = await parser.Parse(uri);
-                //await BigPictureImporter.Site.Parse(uri);
                 var rootFrame = new Frame();
-                rootFrame.Navigate(typeof(Home));
+                rootFrame.Navigate(typeof(FrontPage));
                 Window.Current.Content = rootFrame;
                 Window.Current.Activate();
             }

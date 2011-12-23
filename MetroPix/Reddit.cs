@@ -36,27 +36,6 @@ namespace MetroPix
 
     public abstract class BaseImageImporter
     {
-        protected List<HtmlNode> ExtractImagesFromNode(HtmlNode node)
-        {
-            return node.FindAll((currentNode) =>
-            {
-                if (currentNode.Name.ToLower() == "img")
-                {
-                    // Get the Uri and look for the pattern
-                    string src = currentNode.GetAttributeValue("src", String.Empty);
-                    if (!String.IsNullOrEmpty(src))
-                    {
-                        // TODO: generalized pattern match -- can parameterize?
-                        if (src.Contains("inapcache.boston.com"))
-                        {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            });
-        }
-
         protected abstract void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos);
 
         public virtual async Task<List<PhotoSummary>> Parse(Uri uri)
@@ -76,12 +55,15 @@ namespace MetroPix
     {
         private Dictionary<string, BaseImageImporter> _hostToParserMap = new Dictionary<string, BaseImageImporter>
         {
-            { "boston.com", new BigPictureImporter() }
+            { "www.boston.com", new BigPictureImporter() },
+            { "boston.com", new BigPictureImporter() },
+            { "www.flickr.com", new FlickrImporter() },
+            { "flickr.com", new FlickrImporter() }
         };
 
         public async Task<List<PhotoSummary>> Parse(Uri uri)
         {
-            var hostName = uri.Host.ToLower();
+            var hostName = uri.Host.ToLower(); 
             BaseImageImporter parser = null;
             if (_hostToParserMap.TryGetValue(hostName, out parser))
             {
@@ -123,8 +105,35 @@ namespace MetroPix
 
     public class FlickrImporter : BaseImageImporter
     {
+        // TODO: need to have a pre-processor that does the right thing based on the
+        // type of page that we're looking at. Right now this is a loos processdocument
+        // that will do both Explore pages and Photostreams. However, things are quite
+        // different structurally between the pages.
         protected override void ProcessDocument(HtmlDocument doc, List<PhotoSummary> photos)
         {
+            // Filter
+            List<HtmlNode> imageBlocks = doc.DocumentNode.FindAll((currentNode) =>
+            {
+                var classAttr = currentNode.GetAttributeValue("class", String.Empty);
+                return currentNode.Name.ToLower() == "span" && classAttr.Contains("photo_container");
+            });
+
+            // Build
+            foreach (var imageBlock in imageBlocks)
+            {
+                var caption = imageBlock.FindFirst((captionNode) => { return captionNode.Name.ToLower() == "a"; }).GetAttributeValue("title", String.Empty);
+                var image = imageBlock.FindFirst((imageNode) => { return imageNode.Name.ToLower() == "img" && imageNode.GetAttributeValue("class", String.Empty) == "pc_img"; }).GetAttributeValue("src", String.Empty);
+                // TODO - do better than this. We can decode the Flickr image url syntax 
+                // _m is the medium sized image ... may want to replace with the _l image for large?
+                image = image.Replace("_m", "_z");
+                var photo = new PhotoSummary
+                {
+                    Author = "?",
+                    Caption = caption,
+                    PhotoUri = new Uri(image)
+                };
+                photos.Add(photo);
+            }
         }
     }
 
