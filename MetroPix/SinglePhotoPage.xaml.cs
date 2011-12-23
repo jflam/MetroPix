@@ -20,7 +20,7 @@ namespace MetroPix
         {
             var selectedIndex = Convert.ToInt32(e.Parameter);
             var photos = new List<Uri>();
-            foreach (var photo in FiveHundredPixels.Site.LastQuery)
+            foreach (var photo in (App.Current as App).Photos)
             {
                 photos.Add(photo.PhotoUri);
             }

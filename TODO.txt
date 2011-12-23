@@ -1,9 +1,32 @@
 Developer notes for MetroPix
 
+Goals
+  - Freemium model
+    - Free for public photos, upsell for private photos
+    - TBD whether we have a social media bundle or upsell each experien
+  - A fantastic experience for browsing and discovering free photos
+  - Need great integration with social networking sites like Twitter and Reddit.
+    There is utility in viewing photos through the user interface that will
+    translate into a desire to want the same experience for free photos to
+    transfer over to your personal photos. 
+  - Transfer that same experience to the photos that matter the most to you -
+    friends and family
+
+
 Generic URL parsing - metropix user enters on a URL, we need to:
   - Dispatch the HTML parsing for that URL to a known parser
   - Dispatch the HTML parsing for that URL to a default parser
-  - Offer an upsell experience(?) for key sites such as Flickr, 500px etc.
+  - Offer an upsell experience(?) for key sites such as Flickr, 500px, Facebook
+    etc.
+  - Facebook is a key thing here since I need to authenticate the user to FB
+    using OAuth - this is likely worth selling
+
+Design of the URL parser
+  - User clicks on metropix bookmarklet in IE
+  - Metropix launches with the desired URL
+  - We will have a library of known parsers for a set of top level domains
+  - Initial set will be 500px, The Big Picture, flickr, engadget, The Verge
+
 
 Where are the URLs that make up a user's favorites stored?
   - Simplest thing is a scrolling list of Favorites on their home page
@@ -25,4 +48,14 @@ We need some kind of searchable captioning mechanism
   - Should the OS do this for us using the system indexer? Need sample
   - Ideally would sync across multiple machines
   - Should we use SkyDrive for this? Or should I add easy DropBox integration?
+
+
+Scratchpad:
+- Figure out how to extract the default ViewModel code out of the templates and
+  use that.
+- Figure out a mechanism for having a "ParseUri(Uri)" method that will dispatch
+  to the appropriate top-level handler for that domain (lookup table?)
+- Write a new parser for Engadget and the Verge and look for ways to generalize
+  - especially through mechanisms like following an image link and parsing the
+    file on the other end?
 

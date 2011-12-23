@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Windows.Web.Syndication;
@@ -36,7 +34,15 @@ namespace MetroPix
         }
     }
 
-    public class ImageImporter<T> where T: new()
+    public class BaseImageImporter
+    {
+        public virtual Task<List<PhotoSummary>> Parse(Uri uri)
+        {
+            return null;
+        }
+    }
+
+    public class ImageImporter<T> : BaseImageImporter where T: BaseImageImporter, new() 
     {
         protected List<PhotoSummary> _photos;
 
@@ -77,9 +83,33 @@ namespace MetroPix
         }
     }
 
-    public class HtmlImporter : ImageImporter<HtmlImporter>
+    // Encapsulates knowledge of all known domain-specific parsers and
+    // delegates parsing to the approrpriate implementation.
+    public class UriDispatcher
     {
-        public async Task<List<PhotoSummary>> Query(Uri uri)
+        private Dictionary<string, BaseImageImporter> _hostToParserMap = new Dictionary<string, BaseImageImporter>
+        {
+            { "boston.com", new BigPictureImporter() }
+        };
+
+        public async Task<List<PhotoSummary>> Parse(Uri uri)
+        {
+            var hostName = uri.Host.ToLower();
+            BaseImageImporter parser = null;
+            if (_hostToParserMap.TryGetValue(hostName, out parser))
+            {
+                return await parser.Parse(uri);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public class BigPictureImporter : ImageImporter<BigPictureImporter>
+    {
+        public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             _photos = new List<PhotoSummary>();
             var html = await NetworkManager.Current.GetStringAsync(uri);
@@ -112,7 +142,7 @@ namespace MetroPix
 
     public class RssImporter : ImageImporter<RssImporter>
     {
-        public async Task<List<PhotoSummary>> Query(Uri uri)
+        public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             _photos = new List<PhotoSummary>();
             var client = new SyndicationClient();
@@ -174,7 +204,7 @@ namespace MetroPix
             return result;
         }
 
-        public async Task<List<PhotoSummary>> Query(Uri uri)
+        public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             var html = await NetworkManager.Current.GetStringAsync(uri);
             _photos = Parse(html);
@@ -231,7 +261,7 @@ namespace MetroPix
         }
 
         // Point to a reddit and extract the picture urls
-        public async Task<List<PhotoSummary>> Query(Uri uri)
+        public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             var html = await NetworkManager.Current.GetStringAsync(uri);
             _photos = Parse(html);
