@@ -36,31 +36,6 @@ namespace MetroPix
 
     public class BaseImageImporter
     {
-        public virtual Task<List<PhotoSummary>> Parse(Uri uri)
-        {
-            return null;
-        }
-    }
-
-    public class ImageImporter<T> : BaseImageImporter where T: BaseImageImporter, new() 
-    {
-        protected List<PhotoSummary> _photos;
-
-        public List<PhotoSummary> LastQuery
-        {
-            get
-            {
-                return _photos;
-            }
-        }
-
-        private static T _singleton = new T();
-
-        public static T Site
-        {
-            get { return _singleton; }
-        }
-
         protected List<HtmlNode> ExtractImagesFromNode(HtmlNode node)
         {
             return node.FindAll((currentNode) =>
@@ -80,6 +55,11 @@ namespace MetroPix
                 }
                 return false;
             });
+        }
+
+        public virtual Task<List<PhotoSummary>> Parse(Uri uri)
+        {
+            return null;
         }
     }
 
@@ -107,11 +87,11 @@ namespace MetroPix
         }
     }
 
-    public class BigPictureImporter : ImageImporter<BigPictureImporter>
+    public class BigPictureImporter : BaseImageImporter
     {
         public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
-            _photos = new List<PhotoSummary>();
+            var photos = new List<PhotoSummary>();
             var html = await NetworkManager.Current.GetStringAsync(uri);
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
@@ -133,18 +113,27 @@ namespace MetroPix
                     Caption = caption,
                     PhotoUri = new Uri(image)
                 };
-                _photos.Add(photo);                
+                photos.Add(photo);                
             }
 
-            return _photos;
+            return photos;
         }
     }
 
-    public class RssImporter : ImageImporter<RssImporter>
+    public class FlickrImporter : BaseImageImporter
+    {
+        public override Task<List<PhotoSummary>> Parse(Uri uri)
+        {
+            return base.Parse(uri);
+        }
+    }
+
+    // TODO: fix this
+    public class RssImporter : BaseImageImporter
     {
         public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
-            _photos = new List<PhotoSummary>();
+            var photos = new List<PhotoSummary>();
             var client = new SyndicationClient();
             var feed = await client.RetrieveFeedAsync(uri);
             foreach (var item in feed.Items)
@@ -162,14 +151,14 @@ namespace MetroPix
                         Caption = caption,
                         PhotoUri = new Uri(imageUri.GetAttributeValue("src", String.Empty))
                     };
-                    _photos.Add(photo);
+                    photos.Add(photo);
                 }
             }
-            return _photos;
+            return photos;
         }
     }
 
-    public class ImgurImporter : ImageImporter<ImgurImporter>
+    public class ImgurImporter : BaseImageImporter
     {
         private List<PhotoSummary> Parse(string html)
         {
@@ -207,12 +196,11 @@ namespace MetroPix
         public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             var html = await NetworkManager.Current.GetStringAsync(uri);
-            _photos = Parse(html);
-            return _photos;
+            return Parse(html);
         }
     }
 
-    public class RedditImporter : ImageImporter<RedditImporter>
+    public class RedditImporter : BaseImageImporter
     {
         private List<PhotoSummary> Parse(string html)
         {
@@ -264,8 +252,7 @@ namespace MetroPix
         public override async Task<List<PhotoSummary>> Parse(Uri uri)
         {
             var html = await NetworkManager.Current.GetStringAsync(uri);
-            _photos = Parse(html);
-            return _photos;
+            return Parse(html);
         }
     }
 }
